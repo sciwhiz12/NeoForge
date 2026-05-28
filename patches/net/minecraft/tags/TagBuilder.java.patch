@@ -1,19 +1,9 @@
 --- a/net/minecraft/tags/TagBuilder.java
 +++ b/net/minecraft/tags/TagBuilder.java
-@@ -7,6 +_,8 @@
- public class TagBuilder implements net.neoforged.neoforge.common.extensions.ITagBuilderExtension {
-     private final List<TagEntry> entries = new ArrayList<>();
-     private boolean replace = false;
-+    /// Neo: Entries to be removed from this tag
-+    private final List<TagEntry> removeEntries = new ArrayList<>();
- 
-     public static TagBuilder create() {
-         return new TagBuilder();
-@@ -44,5 +_,23 @@
- 
+@@ -47,4 +_,22 @@
      public TagBuilder addOptionalTag(Identifier id) {
          return this.add(TagEntry.optionalTag(id));
-+    }
+     }
 +
 +    /// Neo: Add an entry to be removed from this tag in datagen.
 +    ///
@@ -31,5 +21,5 @@
 +    /// Neo: Returns the entries to be removed from this tag.
 +    public java.util.stream.Stream<TagEntry> getRemoveEntries() {
 +        return this.removeEntries.stream();
-     }
++    }
  }

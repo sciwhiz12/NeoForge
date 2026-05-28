@@ -28,7 +28,7 @@
          values.unwrap().ifRight(directValues -> {
              if (directValues.isEmpty()) {
                  throw new UnsupportedOperationException("Ingredients can't be empty");
-@@ -45,30 +_,95 @@
+@@ -47,30 +_,95 @@
          this.values = values;
      }
  
@@ -124,8 +124,8 @@
 +        return this.customIngredientValues;
      }
  
-     public static Ingredient of(ItemLike itemLike) {
-@@ -88,6 +_,9 @@
+     @Override
+@@ -95,6 +_,9 @@
      }
  
      public SlotDisplay display() {

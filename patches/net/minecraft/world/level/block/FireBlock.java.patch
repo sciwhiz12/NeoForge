@@ -102,15 +102,6 @@
                  return true;
              }
          }
-@@ -274,7 +_,7 @@
- 
-             for (Direction direction : Direction.values()) {
-                 BlockState blockState = level.getBlockState(pos.relative(direction));
--                odds = Math.max(this.getIgniteOdds(blockState), odds);
-+                odds = Math.max(blockState.getFireSpreadSpeed(level, pos.relative(direction), direction.getOpposite()), odds);
-             }
- 
-             return odds;
 @@ -282,6 +_,7 @@
      }
  

@@ -12,12 +12,3 @@
          TextureSlots textureSlots = model.getTopTextureSlots();
          boolean hasAmbientOcclusion = model.getTopAmbientOcclusion();
          Material.Baked particleMaterial = model.resolveParticleMaterial(textureSlots, modelBakery);
-@@ -43,7 +_,7 @@
-         }
- 
-         if (forbiddenSprites != null) {
--            LOGGER.warn("Rejecting block model {}, since it contains sprites from outside of supported atlas: {}", location, forbiddenSprites);
-+            LOGGER.warn("Rejecting block model {}, since it contains sprites from outside of supported atlas: {}", model.debugName(), forbiddenSprites);
-             return modelBakery.missingBlockModelPart();
-         } else {
-             return new SimpleModelWrapper(geometry, hasAmbientOcclusion, particleMaterial);

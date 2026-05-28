@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/chunk/SectionCompiler.java
 +++ b/net/minecraft/client/renderer/chunk/SectionCompiler.java
-@@ -59,6 +_,10 @@
+@@ -50,6 +_,10 @@
      }
  
      public SectionCompiler.Results compile(SectionPos sectionPos, RenderSectionRegion region, VertexSorting vertexSorting, SectionBufferBuilderPack builders) {
@@ -11,7 +11,7 @@
          SectionCompiler.Results results = new SectionCompiler.Results();
          BlockPos minPos = sectionPos.origin();
          BlockPos maxPos = minPos.offset(15, 15, 15);
-@@ -94,6 +_,8 @@
+@@ -85,6 +_,8 @@
  
                      FluidState fluidState = blockState.getFluidState();
                      if (!fluidState.isEmpty()) {
@@ -20,7 +20,7 @@
                          fluidRenderer.tesselate(region, pos, fluidOutput, blockState, fluidState);
                      }
  
-@@ -119,6 +_,7 @@
+@@ -110,6 +_,7 @@
              }
          }
  

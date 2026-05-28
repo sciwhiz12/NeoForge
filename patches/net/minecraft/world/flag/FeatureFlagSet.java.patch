@@ -21,16 +21,6 @@
      }
  
      static FeatureFlagSet create(FeatureFlagUniverse universe, Collection<FeatureFlag> flags) {
-@@ -21,7 +_,8 @@
-             return EMPTY;
-         } else {
-             long mask = computeMask(universe, 0L, flags);
--            return new FeatureFlagSet(universe, mask);
-+            long[] extMask = computeExtendedMask(universe, 0, 0L, flags);
-+            return new FeatureFlagSet(universe, mask, extMask);
-         }
-     }
- 
 @@ -30,16 +_,19 @@
      }
  
@@ -147,36 +137,3 @@
          }
      }
  
-@@ -89,17 +_,29 @@
-             throw new IllegalArgumentException("Mismatched set elements: '" + this.universe + "' != '" + other.universe + "'");
-         } else {
-             long newMask = this.mask & ~other.mask;
--            return newMask == 0L ? EMPTY : new FeatureFlagSet(this.universe, newMask);
-+            long[] extMask = EMPTY_EXT_MASK;
-+            if (this.extendedMask.length > 0 || other.extendedMask.length > 0) {
-+                extMask = new long[this.extendedMask.length];
-+                for (int idx = 0; idx < extMask.length; idx++) {
-+                    long otherMask = idx < other.extendedMask.length ? other.extendedMask[idx] : 0L;
-+                    extMask[idx] = this.extendedMask[idx] & ~otherMask;
-+                }
-+            }
-+            return newMask == 0L && extMask.length == 0 ? EMPTY : new FeatureFlagSet(this.universe, newMask, extMask);
-         }
-     }
- 
-     @Override
-     public boolean equals(Object o) {
--        return this == o ? true : o instanceof FeatureFlagSet that && this.universe == that.universe && this.mask == that.mask;
-+        return this == o ? true : o instanceof FeatureFlagSet that && this.universe == that.universe && this.mask == that.mask && Arrays.equals(this.extendedMask, that.extendedMask);
-     }
- 
-     @Override
-     public int hashCode() {
--        return (int)HashCommon.mix(this.mask);
-+        int hash = (int)HashCommon.mix(this.mask);
-+        for (long extMask : this.extendedMask) {
-+            hash = 13 * hash + (int) HashCommon.mix(extMask);
-+        }
-+        return hash;
-     }
- }
