@@ -1,0 +1,21 @@
+--- a/com/mojang/blaze3d/vulkan/VulkanRenderPass.java
++++ b/com/mojang/blaze3d/vulkan/VulkanRenderPass.java
+@@ -152,6 +_,18 @@
+     }
+ 
+     @Override
++    public void setViewport(int x, int y, int width, int height) {
++        try (MemoryStack stack = MemoryStack.stackPush()) {
++            VkViewport.Buffer viewport = VkViewport.calloc(1, stack);
++            viewport.x(x);
++            viewport.y(y);
++            viewport.width(width);
++            viewport.height(height);
++            VK12.vkCmdSetViewport(this.commandBuffer(), 0, viewport);
++        }
++    }
++
++    @Override
+     public void enableScissor(int x, int y, int width, int height) {
+         try (MemoryStack stack = MemoryStack.stackPush()) {
+             setScissor(stack, this.commandBuffer(), x, y, width, height);

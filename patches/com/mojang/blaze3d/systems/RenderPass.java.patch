@@ -1,7 +1,7 @@
 --- a/com/mojang/blaze3d/systems/RenderPass.java
 +++ b/com/mojang/blaze3d/systems/RenderPass.java
-@@ -68,6 +68,10 @@
-         }
+@@ -116,6 +_,10 @@
+         this.backend.setUniform(name, value);
      }
  
 +    public void setViewport(int x, int y, int width, int height) {
@@ -9,5 +9,5 @@
 +    }
 +
      public void enableScissor(int x, int y, int width, int height) {
-         this.backend.enableScissor(x, y, width, height);
-     }
+         if (width > 0 && height > 0) {
+             if (x >= this.renderArea.x()
