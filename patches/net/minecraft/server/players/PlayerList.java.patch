@@ -120,6 +120,15 @@
          result.setPlayer(player);
          return result;
      }
+@@ -815,7 +_,7 @@
+     }
+ 
+     public List<ServerPlayer> getPlayers() {
+-        return this.players;
++        return this.playersView; // Neo: Return an unmodifiable view, we don't want people removing things without us knowing.
+     }
+ 
+     public Map<UUID, ServerPlayer> getPlayersByUUID() {
 @@ -845,6 +_,7 @@
              advancements.reload(this.server.getAdvancements());
          }

@@ -9,6 +9,18 @@
          thread.setUncaughtExceptionHandler((t, e) -> LOGGER.error("Uncaught exception in server thread", e));
          if (Runtime.getRuntime().availableProcessors() > 4) {
              thread.setPriority(8);
+@@ -350,9 +_,9 @@
+         this.structureTemplateManager = new StructureTemplateManager(worldStem.resourceManager(), storageSource, fixerUpper, blockLookup);
+         this.serverThread = serverThread;
+         this.executor = Util.backgroundExecutor();
+-        this.potionBrewing = PotionBrewing.bootstrap(this.worldData.enabledFeatures());
++        this.potionBrewing = PotionBrewing.bootstrap(this.worldData.enabledFeatures(), this.registryAccess());
+         this.resources.managers.getRecipeManager().finalizeRecipeLoading(this.worldData.enabledFeatures());
+-        this.fuelValues = FuelValues.vanillaBurnTimes(this.registries.compositeAccess(), this.worldData.enabledFeatures());
++        this.fuelValues = net.neoforged.neoforge.common.DataMapHooks.populateFuelValues(this.registries.compositeAccess(), this.worldData.enabledFeatures());
+         this.tickFrame = TracyClient.createDiscontinuousFrame("Server Tick");
+         this.notificationManager = notificationManager;
+         this.serverActivityMonitor = new ServerActivityMonitor(notificationManager, 30);
 @@ -436,6 +_,7 @@
          this.scoreboard.load(this.savedDataStorage.computeIfAbsent(ScoreboardSaveData.TYPE).getData());
          this.commandStorage = new CommandStorage(this.savedDataStorage);
@@ -41,6 +53,14 @@
                  }
              });
          }
+@@ -675,6 +_,7 @@
+             if (level != null) {
+                 try {
+                     level.close();
++                    net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.LevelEvent.Unload(level));
+                 } catch (IOException e) {
+                     LOGGER.error("Exception closing the level", e);
+                 }
 @@ -721,9 +_,11 @@
                  throw new IllegalStateException("Failed to initialize server");
              }
@@ -204,6 +224,27 @@
              }, this);
          if (this.isSameThread()) {
              this.managedBlock(result::isDone);
+@@ -1572,8 +_,10 @@
+         FeatureFlagSet forcedFeatures = initMode ? FeatureFlagSet.of() : initialDataConfig.enabledFeatures();
+         FeatureFlagSet allowedFeatures = initMode ? FeatureFlags.REGISTRY.allFlags() : initialDataConfig.enabledFeatures();
+         packRepository.reload();
++        DataPackConfig.DEFAULT.addModPacks(net.neoforged.neoforge.common.CommonHooks.getModDataPacks());
++        dataPackConfig.addModPacks(net.neoforged.neoforge.common.CommonHooks.getModDataPacks());
+         if (safeMode) {
+-            return configureRepositoryWithSelection(packRepository, List.of("vanilla"), forcedFeatures, false);
++            return configureRepositoryWithSelection(packRepository, net.neoforged.neoforge.common.CommonHooks.getModDataPacksWithVanilla(), forcedFeatures, false);
+         }
+ 
+         Set<String> selected = Sets.newLinkedHashSet();
+@@ -1620,6 +_,8 @@
+             selected.add("vanilla");
+         }
+ 
++        net.neoforged.neoforge.resource.ResourcePackLoader.reorderNewlyDiscoveredPacks(selected, dataPackConfig.getEnabled(), packRepository);
++
+         return configureRepositoryWithSelection(packRepository, selected, forcedFeatures, true);
+     }
+ 
 @@ -1843,6 +_,31 @@
  
      public abstract boolean isSingleplayerOwner(NameAndId nameAndId);

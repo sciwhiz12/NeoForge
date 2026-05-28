@@ -107,6 +107,14 @@
              BedRule rule = this.level().environmentAttributes().getValue(EnvironmentAttributes.BED_RULE, pos);
              boolean canSleep = rule.canSleep(this.level());
              boolean canSetSpawn = rule.canSetSpawn(this.level());
+@@ -1237,6 +_,7 @@
+             return Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
+         }
+     }
++    }
+ 
+     @Override
+     public void startSleeping(BlockPos bedPosition) {
 @@ -1245,6 +_,7 @@
      }
  
