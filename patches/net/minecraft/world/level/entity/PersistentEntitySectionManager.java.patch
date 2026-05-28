@@ -9,7 +9,7 @@
 +        return addEntityWithoutEvent(entity, loaded);
 +    }
 +
-+    public boolean addEntityWithoutEvent(T entity) {
++    public boolean addNewEntityWithoutEvent(T entity) {
 +        return addEntityWithoutEvent(entity, false);
 +    }
 +

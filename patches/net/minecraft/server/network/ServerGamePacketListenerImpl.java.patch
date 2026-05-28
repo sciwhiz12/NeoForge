@@ -138,6 +138,15 @@
          if (this.player.isModelPartShown(PlayerModelPart.HAT) != wasHatShown) {
              this.server.getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_HAT, this.player));
          }
+@@ -2160,7 +_,7 @@
+         this.connection
+             .setupInboundProtocol(
+                 ConfigurationProtocols.SERVERBOUND,
+-                new ServerConfigurationPacketListenerImpl(this.server, this.connection, this.createCookie(this.player.clientInformation()))
++                new ServerConfigurationPacketListenerImpl(this.server, this.connection, this.createCookie(this.player.clientInformation(), this.connectionType))
+             );
+     }
+ 
 @@ -2194,6 +_,7 @@
  
      @Override

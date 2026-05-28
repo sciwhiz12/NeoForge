@@ -15,3 +15,28 @@
                  this.server.fillSystemReport(report.getSystemReport());
                  CrashReportCategory serverStats = report.addCategory("Performance stats");
                  serverStats.setDetail("Random tick rate", () -> this.server.getGameRules().getAsString(GameRules.RANDOM_TICK_SPEED));
+@@ -77,10 +_,14 @@
+     }
+ 
+     public static CrashReport createWatchdogCrashReport(String message, long mainThreadId) {
++        return createWatchdogCrashReport(message, mainThreadId, "Watchdog");
++    }
++
++    public static CrashReport createWatchdogCrashReport(String message, long mainThreadId, String messageSource) {
+         ThreadInfo[] threadInfos = Util.dumpThreadInfo();
+         Arrays.sort(threadInfos, THREAD_INFO_COMPARATOR);
+         StringBuilder builder = new StringBuilder();
+-        Error exception = new Error("Watchdog (" + message + ")");
++        Error exception = new Error(messageSource + " (" + message + ")");
+ 
+         for (ThreadInfo threadInfo : threadInfos) {
+             if (threadInfo.getThreadId() == mainThreadId) {
+@@ -88,7 +_,7 @@
+             }
+ 
+             builder.append("\n");
+-            builder.append(threadInfo);
++            builder.append(net.neoforged.neoforge.logging.ThreadInfoUtil.getEntireStacktrace(threadInfo));
+         }
+ 
+         CrashReport report = new CrashReport(message, exception);

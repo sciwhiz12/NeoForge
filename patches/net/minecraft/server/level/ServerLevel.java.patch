@@ -42,6 +42,18 @@
          this.structureCheck = new StructureCheck(
              this.chunkSource.chunkScanner(),
              this.registryAccess(),
+@@ -304,6 +_,11 @@
+         this.waypointManager = new ServerWaypointManager();
+         this.environmentAttributes = EnvironmentAttributeSystem.builder().addDefaultLayers(this).build();
+         this.updateSkyBrightness();
++
++        net.neoforged.neoforge.attachment.LevelAttachmentsSavedData.init(this);
++        // Neo: Move the initialization of customSpawners to the end of costructor
++        // Providing a fully initialized ServerLevel instance for the ServerLevelEvent.CustomSpawners
++        this.customSpawners = net.neoforged.neoforge.event.EventHooks.getCustomSpawners(this, customSpawners);
+     }
+ 
+     @Override
 @@ -367,7 +_,11 @@
          if (this.sleepStatus.areEnoughSleeping(percentage) && this.sleepStatus.areEnoughDeepSleeping(percentage, this.players)) {
              Optional<Holder<WorldClock>> defaultClock = this.dimensionType().defaultClock();
