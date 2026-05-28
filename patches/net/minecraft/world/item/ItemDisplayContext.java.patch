@@ -1,5 +1,15 @@
 --- a/net/minecraft/world/item/ItemDisplayContext.java
 +++ b/net/minecraft/world/item/ItemDisplayContext.java
+@@ -7,6 +_,9 @@
+ 
+ import net.neoforged.fml.common.asm.enumextension.IExtensibleEnum;
+ 
++@net.neoforged.fml.common.asm.enumextension.IndexedEnum
++@net.neoforged.fml.common.asm.enumextension.NamedEnum(1)
++@net.neoforged.fml.common.asm.enumextension.NetworkedEnum(net.neoforged.fml.common.asm.enumextension.NetworkedEnum.NetworkCheck.CLIENTBOUND)
+ public enum ItemDisplayContext implements StringRepresentable, IExtensibleEnum {
+     NONE(0, "none"),
+     THIRD_PERSON_LEFT_HAND(1, "thirdperson_lefthand"),
 @@ -23,10 +_,22 @@
      public static final IntFunction<ItemDisplayContext> BY_ID = ByIdMap.continuous(ItemDisplayContext::getId, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
      private final byte id;

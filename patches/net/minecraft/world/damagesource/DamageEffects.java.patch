@@ -1,5 +1,14 @@
 --- a/net/minecraft/world/damagesource/DamageEffects.java
 +++ b/net/minecraft/world/damagesource/DamageEffects.java
+@@ -7,6 +_,8 @@
+ 
+ import net.neoforged.fml.common.asm.enumextension.IExtensibleEnum;
+ 
++@net.neoforged.fml.common.asm.enumextension.NamedEnum
++@net.neoforged.fml.common.asm.enumextension.NetworkedEnum(net.neoforged.fml.common.asm.enumextension.NetworkedEnum.NetworkCheck.CLIENTBOUND)
+ public enum DamageEffects implements StringRepresentable, IExtensibleEnum {
+     HURT("hurt", SoundEvents.PLAYER_HURT),
+     THORNS("thorns", SoundEvents.PLAYER_HURT),
 @@ -17,11 +_,33 @@
  
      public static final Codec<DamageEffects> CODEC = StringRepresentable.fromEnum(DamageEffects::values);

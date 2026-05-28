@@ -1,6 +1,6 @@
 --- a/net/minecraft/util/datafix/fixes/StructuresBecomeConfiguredFix.java
 +++ b/net/minecraft/util/datafix/fixes/StructuresBecomeConfiguredFix.java
-@@ -177,7 +177,11 @@
+@@ -177,7 +_,11 @@
      private @Nullable Dynamic<?> findUpdatedStructureType(Dynamic<?> dynamicKey, Dynamic<?> chunk) {
          String key = dynamicKey.asString("UNKNOWN").toLowerCase(Locale.ROOT);
          StructuresBecomeConfiguredFix.Conversion conversion = CONVERSION_MAP.get(key);
@@ -10,5 +10,5 @@
 +            if (net.neoforged.neoforge.common.CommonHooks.checkStructureNamespace(key)) return chunk.createString(key); // Neo: pass-through structure IDs which have a non-"minecraft" namespace
 +            if (true) return chunk.createString("unknown." + key); // Neo: Pass-through with "unknown." prefix, so deserializer logs and ignores rather than fixer throwing an exception and dropping chunk data
              return null;
-         } else {
-             String resultingId = conversion.fallback;
+         }
+ 

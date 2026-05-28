@@ -1,5 +1,14 @@
 --- a/net/minecraft/world/level/biome/BiomeSpecialEffects.java
 +++ b/net/minecraft/world/level/biome/BiomeSpecialEffects.java
+@@ -73,6 +_,8 @@
+         }
+     }
+ 
++    @net.neoforged.fml.common.asm.enumextension.NamedEnum
++    @net.neoforged.fml.common.asm.enumextension.NetworkedEnum(net.neoforged.fml.common.asm.enumextension.NetworkedEnum.NetworkCheck.CLIENTBOUND)
+     public enum GrassColorModifier implements StringRepresentable, IExtensibleEnum {
+         NONE("none") {
+             @Override
 @@ -95,12 +_,22 @@
          };
  
