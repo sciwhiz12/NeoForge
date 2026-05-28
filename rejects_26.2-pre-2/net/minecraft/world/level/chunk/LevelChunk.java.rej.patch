@@ -1,0 +1,35 @@
+--- a/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -291,7 +292,7 @@
+                     this.level.getChunkSource().onSectionEmptinessChanged(this.chunkPos.x(), SectionPos.blockToSectionCoord(y), this.chunkPos.z(), isEmpty);
+                 }
+ 
+-                if (LightEngine.hasDifferentLightProperties(oldState, state)) {
++                if (LightEngine.hasDifferentLightProperties(this, pos, oldState, state)) {
+                     ProfilerFiller profiler = Profiler.get();
+                     profiler.push("updateSkyLightSources");
+                     this.skyLightSources.update(this, localX, y, localZ);
+@@ -323,7 +324,7 @@
+                 if (!section.getBlockState(localX, localY, localZ).is(newBlock)) {
+                     return null;
+                 } else {
+-                    if (!this.level.isClientSide() && (flags & 512) == 0) {
++                    if (!this.level.isClientSide() && !this.level.captureBlockSnapshots && (flags & 512) == 0) {
+                         state.onPlace(this.level, pos, oldState, movedByPiston);
+                     }
+ 
+@@ -455,9 +459,14 @@
+     public @Nullable CompoundTag getBlockEntityNbtForSaving(BlockPos blockPos, HolderLookup.Provider registryAccess) {
+         BlockEntity blockEntity = this.getBlockEntity(blockPos);
+         if (blockEntity != null && !blockEntity.isRemoved()) {
++            try {
+             CompoundTag result = blockEntity.saveWithFullMetadata(this.level.registryAccess());
+             result.putBoolean("keepPacked", false);
+             return result;
++            } catch (Exception e) {
++                LOGGER.error("A BlockEntity type {} has thrown an exception trying to write state. It will not persist, Report this to the mod author", blockEntity.getClass().getName(), e);
++                return null;
++            }
+         } else {
+             CompoundTag result = this.pendingBlockEntities.get(blockPos);
+             if (result != null) {

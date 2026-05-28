@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/entity/ai/behavior/HarvestFarmland.java
++++ b/net/minecraft/world/entity/ai/behavior/HarvestFarmland.java
+@@ -46,7 +46,7 @@
+     }
+ 
+     protected boolean checkExtraStartConditions(ServerLevel level, Villager body) {
+-        if (!level.getGameRules().get(GameRules.MOB_GRIEFING)) {
++        if (!net.neoforged.neoforge.event.EventHooks.canEntityGrief(level, body)) {
+             return false;
+         } else if (!body.getVillagerData().profession().is(VillagerProfession.FARMER)) {
+             return false;

@@ -1,0 +1,14 @@
+--- a/net/minecraft/client/renderer/entity/player/AvatarRenderer.java
++++ b/net/minecraft/client/renderer/entity/player/AvatarRenderer.java
+@@ -94,6 +94,11 @@
+     }
+ 
+     private static HumanoidModel.ArmPose getArmPose(Avatar avatar, ItemStack itemInHand, InteractionHand hand) {
++        var extensions = net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(itemInHand);
++        var armPose = extensions.getArmPose(avatar, hand, itemInHand);
++        if (armPose != null) {
++            return armPose;
++        }
+         if (itemInHand.isEmpty()) {
+             return HumanoidModel.ArmPose.EMPTY;
+         } else if (!avatar.swinging && itemInHand.is(Items.CROSSBOW) && CrossbowItem.isCharged(itemInHand)) {

@@ -1,0 +1,10 @@
+--- a/net/minecraft/client/gui/font/providers/GlyphProviderType.java
++++ b/net/minecraft/client/gui/font/providers/GlyphProviderType.java
+@@ -8,6 +8,7 @@
+ import net.neoforged.api.distmarker.OnlyIn;
+ 
+ @OnlyIn(Dist.CLIENT)
++@net.neoforged.fml.common.asm.enumextension.NamedEnum
+ public enum GlyphProviderType implements StringRepresentable, net.neoforged.fml.common.asm.enumextension.IExtensibleEnum {
+     BITMAP("bitmap", BitmapProvider.Definition.CODEC),
+     TTF("ttf", TrueTypeGlyphProviderDefinition.CODEC),

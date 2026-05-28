@@ -1,0 +1,10 @@
+--- a/net/minecraft/client/gui/screens/LoadingOverlay.java
++++ b/net/minecraft/client/gui/screens/LoadingOverlay.java
+@@ -164,7 +165,6 @@
+                 this.onFinish.accept(Optional.of(var2));
+             }
+ 
+-            this.fadeOutStart = Util.getMillis();
+             if (this.minecraft.screen != null) {
+                 Window window = this.minecraft.getWindow();
+                 this.minecraft.screen.init(window.getGuiScaledWidth(), window.getGuiScaledHeight());

@@ -1,0 +1,30 @@
+--- a/com/mojang/blaze3d/opengl/GlCommandEncoder.java
++++ b/com/mojang/blaze3d/opengl/GlCommandEncoder.java
+@@ -141,7 +141,8 @@
+ 
+     @Override
+     public void clearDepthTexture(GpuTexture depthTexture, double clearDepth) {
+-        this.device.directStateAccess().bindFrameBufferTextures(this.drawFbo, 0, ((GlTexture)depthTexture).id, 0, 36160);
++        boolean hasStencil = depthTexture.getFormat().hasStencilAspect();
++        this.device.directStateAccess().bindFrameBufferTextures(this.drawFbo, 0, ((GlTexture)depthTexture).id, 0, 36160, hasStencil);
+         GL11.glDrawBuffer(0);
+         GL11.glClearDepth(clearDepth);
+         GlStateManager._depthMask(true);
+@@ -153,6 +154,17 @@
+     }
+ 
+     @Override
++    public void clearStencilTexture(GpuTexture texture, int value) {
++        this.device.directStateAccess().bindFrameBufferTextures(this.drawFbo, 0, ((GlTexture)texture).id, 0, GlConst.GL_FRAMEBUFFER, true);
++        GL11.glDrawBuffer(GlConst.GL_NONE);
++        GL11.glClearStencil(value);
++        GlStateManager._depthMask(true);
++        GlStateManager._clear(GL11.GL_STENCIL_BUFFER_BIT);
++        GL11.glDrawBuffer(GlConst.GL_COLOR_ATTACHMENT0);
++        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, 0);
++    }
++
++    @Override
+     public void writeToBuffer(GpuBufferSlice slice, ByteBuffer data) {
+         GlBuffer buffer = (GlBuffer)slice.buffer();
+         if (buffer.closed) {

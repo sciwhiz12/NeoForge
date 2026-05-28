@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/damagesource/DamageScaling.java
++++ b/net/minecraft/world/damagesource/DamageScaling.java
+@@ -3,6 +3,8 @@
+ import com.mojang.serialization.Codec;
+ import net.minecraft.util.StringRepresentable;
+ 
++@net.neoforged.fml.common.asm.enumextension.NamedEnum
++@net.neoforged.fml.common.asm.enumextension.NetworkedEnum(net.neoforged.fml.common.asm.enumextension.NetworkedEnum.NetworkCheck.CLIENTBOUND)
+ public enum DamageScaling implements StringRepresentable, net.neoforged.fml.common.asm.enumextension.IExtensibleEnum {
+     NEVER("never"),
+     WHEN_CAUSED_BY_LIVING_NON_PLAYER("when_caused_by_living_non_player"),

@@ -1,0 +1,12 @@
+--- a/net/minecraft/client/renderer/state/level/LevelRenderState.java
++++ b/net/minecraft/client/renderer/state/level/LevelRenderState.java
+@@ -26,6 +26,9 @@
+     public int cloudColor;
+     public float cloudHeight;
+     public @Nullable ChunkSectionsToRender chunkSectionsToRender;
++    public net.neoforged.neoforge.client.@Nullable CustomSkyboxRenderer customSkyboxRenderer;
++    public net.neoforged.neoforge.client.@Nullable CustomCloudsRenderer customCloudsRenderer;
++    public net.neoforged.neoforge.client.@Nullable CustomWeatherEffectRenderer customWeatherEffectRenderer;
+ 
+     public void reset() {
+         this.entityRenderStates.clear();

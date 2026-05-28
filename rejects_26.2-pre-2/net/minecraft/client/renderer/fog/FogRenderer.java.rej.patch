@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/renderer/fog/FogRenderer.java
++++ b/net/minecraft/client/renderer/fog/FogRenderer.java
+@@ -151,7 +151,7 @@
+                 fogBlue = Mth.lerp(brightenFactor, fogBlue, fogBlue * targetScale);
+             }
+ 
+-            dest.set(fogRed, fogGreen, fogBlue, 1.0F);
++            net.neoforged.neoforge.client.ClientHooks.getFogColor(camera, partialTicks, level, renderDistance, darkenWorldAmount, fogRed, fogGreen, fogBlue, dest);
+         }
+     }
+ 

@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/entity/ai/behavior/GiveGiftToHero.java
++++ b/net/minecraft/world/entity/ai/behavior/GiveGiftToHero.java
+@@ -108,6 +110,8 @@
+         if (villager.isBaby()) {
+             return BuiltInLootTables.BABY_VILLAGER_GIFT;
+         } else {
++            var gift = villager.getVillagerData().profession().getData(net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps.RAID_HERO_GIFTS);
++            if (gift != null) return gift.lootTable();
+             Optional<ResourceKey<VillagerProfession>> profession = villager.getVillagerData().profession().unwrapKey();
+             return profession.isEmpty() ? BuiltInLootTables.UNEMPLOYED_GIFT : GIFTS.getOrDefault(profession.get(), BuiltInLootTables.UNEMPLOYED_GIFT);
+         }

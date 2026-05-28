@@ -1,0 +1,21 @@
+--- a/net/minecraft/server/level/ServerChunkCache.java
++++ b/net/minecraft/server/level/ServerChunkCache.java
+@@ -160,6 +160,10 @@
+                 }
+             }
+ 
++            ChunkHolder chunkholder = this.getVisibleChunkIfPresent(pos);
++            if (chunkholder != null && chunkholder.currentlyLoading != null)
++                return chunkholder.currentlyLoading; // Neo: If the requested chunk is loading, bypass the future chain to prevent a deadlock.
++
+             profiler.incrementCounter("getChunkCacheMiss");
+             CompletableFuture<ChunkResult<ChunkAccess>> serverFuture = this.getChunkFutureMainThread(x, z, targetStatus, loadOrGenerate);
+             this.mainThreadProcessor.managedBlock(serverFuture::isDone);
+@@ -193,6 +197,7 @@
+             if (chunkHolder == null) {
+                 return null;
+             } else {
++                if (chunkHolder.currentlyLoading != null) return chunkHolder.currentlyLoading; // Forge: If the requested chunk is loading, bypass the future chain to prevent a deadlock.
+                 ChunkAccess chunk = chunkHolder.getChunkIfPresent(ChunkStatus.FULL);
+                 if (chunk != null) {
+                     this.storeInCache(pos, chunk, ChunkStatus.FULL);

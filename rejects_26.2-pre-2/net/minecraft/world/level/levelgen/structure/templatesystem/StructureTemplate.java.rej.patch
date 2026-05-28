@@ -1,0 +1,64 @@
+--- a/net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate.java
++++ b/net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate.java
+@@ -209,7 +209,7 @@
+                         new StructureTemplate.StructureBlockInfo(
+                             calculateRelativePosition(settings, blockInfo.pos()).offset(position),
+                             blockInfo.state.rotate(settings.getRotation()),
+-                            blockInfo.nbt
++                            net.neoforged.neoforge.common.CommonHooks.captureStructureRotation(blockInfo.nbt, rotation)
+                         )
+                     )
+                 );
+@@ -228,7 +228,7 @@
+             for (StructureTemplate.StructureBlockInfo blockInfo : settings.getRandomPalette(this.palettes, position).blocks(block)) {
+                 BlockPos blockPos = absolute ? calculateRelativePosition(settings, blockInfo.pos).offset(position) : blockInfo.pos;
+                 if (boundingBox == null || boundingBox.isInside(blockPos)) {
+-                    result.add(new StructureTemplate.StructureBlockInfo(blockPos, blockInfo.state.rotate(settings.getRotation()), blockInfo.nbt));
++                    result.add(new StructureTemplate.StructureBlockInfo(blockPos, blockInfo.state.rotate(settings.getRotation()), net.neoforged.neoforge.common.CommonHooks.captureStructureRotation(blockInfo.nbt, settings.getRotation())));
+                 }
+             }
+ 
+@@ -272,7 +276,7 @@
+                 int maxX = Integer.MIN_VALUE;
+                 int maxY = Integer.MIN_VALUE;
+                 int maxZ = Integer.MIN_VALUE;
+-                List<StructureTemplate.StructureBlockInfo> processedBlockInfoList = processBlockInfos(level, position, referencePos, settings, blockInfoList);
++                List<StructureTemplate.StructureBlockInfo> processedBlockInfoList = processBlockInfos(level, position, referencePos, settings, blockInfoList, this);
+ 
+                 try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(LOGGER)) {
+                     for (StructureTemplate.StructureBlockInfo blockInfo : processedBlockInfoList) {
+@@ -302,6 +306,7 @@
+                                         blockEntity.loadWithComponents(
+                                             TagValueInput.create(reporter.forChild(blockEntity.problemPath()), level.registryAccess(), blockInfo.nbt)
+                                         );
++                                        net.neoforged.neoforge.common.CommonHooks.applyStructureRotation(blockEntity, blockInfo.nbt, settings);
+                                     }
+                                 }
+ 
+@@ -387,16 +392,7 @@
+                     }
+ 
+                     if (!settings.isIgnoreEntities()) {
+-                        this.placeEntities(
+-                            level,
+-                            position,
+-                            settings.getMirror(),
+-                            settings.getRotation(),
+-                            settings.getRotationPivot(),
+-                            boundingBox,
+-                            settings.shouldFinalizeEntities(),
+-                            reporter
+-                        );
++                        this.addEntitiesToWorld(level, position, settings, reporter);
+                     }
+                 }
+ 
+@@ -449,7 +453,7 @@
+             Iterator<StructureProcessor> iterator = settings.getProcessors().iterator();
+ 
+             while (processedBlockInfo != null && iterator.hasNext()) {
+-                processedBlockInfo = iterator.next().processBlock(level, position, referencePos, blockInfo, processedBlockInfo, settings);
++                processedBlockInfo = iterator.next().process(level, position, referencePos, blockInfo, processedBlockInfo, settings, template);
+             }
+ 
+             if (processedBlockInfo != null) {

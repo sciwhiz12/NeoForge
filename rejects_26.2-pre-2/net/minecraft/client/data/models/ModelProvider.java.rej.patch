@@ -1,0 +1,15 @@
+--- a/net/minecraft/client/data/models/ModelProvider.java
++++ b/net/minecraft/client/data/models/ModelProvider.java
+@@ -131,10 +195,9 @@
+                     this.register(acceptor, donorInfo);
+                 }
+             });
+-            List<Identifier> missingDefinitions = BuiltInRegistries.ITEM
+-                .listElements()
++            List<Identifier> missingDefinitions = knownItems.get()
+                 .filter(e -> !this.itemInfos.containsKey(e.value()))
+-                .map(e -> e.key().identifier())
++                .map(e -> e.unwrapKey().orElseThrow().identifier())
+                 .toList();
+             if (!missingDefinitions.isEmpty()) {
+                 throw new IllegalStateException("Missing item model definitions for: " + missingDefinitions);

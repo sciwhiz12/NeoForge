@@ -1,0 +1,26 @@
+--- a/net/minecraft/server/dedicated/ServerWatchdog.java
++++ b/net/minecraft/server/dedicated/ServerWatchdog.java
+@@ -75,17 +81,21 @@
+     }
+ 
+     public static CrashReport createWatchdogCrashReport(String message, long mainThreadId) {
++        return createWatchdogCrashReport(message, mainThreadId, "Watchdog");
++    }
++
++    public static CrashReport createWatchdogCrashReport(String message, long mainThreadId, String messageSource) {
+         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+         ThreadInfo[] threadInfos = threadMXBean.dumpAllThreads(true, true);
+         StringBuilder builder = new StringBuilder();
+-        Error exception = new Error("Watchdog");
++        Error exception = new Error(messageSource);
+ 
+         for (ThreadInfo threadInfo : threadInfos) {
+             if (threadInfo.getThreadId() == mainThreadId) {
+                 exception.setStackTrace(threadInfo.getStackTrace());
+             }
+ 
+-            builder.append(threadInfo);
++            builder.append(net.neoforged.neoforge.logging.ThreadInfoUtil.getEntireStacktrace(threadInfo));
+             builder.append("\n");
+         }
+ 

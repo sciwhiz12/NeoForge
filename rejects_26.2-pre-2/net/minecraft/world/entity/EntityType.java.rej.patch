@@ -1,0 +1,28 @@
+--- a/net/minecraft/world/entity/EntityType.java
++++ b/net/minecraft/world/entity/EntityType.java
+@@ -1225,6 +1225,11 @@
+     private final FeatureFlagSet requiredFeatures;
+     private final boolean allowedInPeaceful;
+ 
++    private final java.util.function.Predicate<EntityType<?>> trackDeltasSupplier;
++    private final java.util.function.ToIntFunction<EntityType<?>> trackingRangeSupplier;
++    private final java.util.function.ToIntFunction<EntityType<?>> updateIntervalSupplier;
++    private final boolean onlyOpCanSetNbt;
++
+     private static <T extends Entity> EntityType<T> register(ResourceKey<EntityType<?>> id, EntityType.Builder<T> builder) {
+         return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, builder.build(id));
+     }
+@@ -1357,6 +1390,13 @@
+                 mob.yHeadRot = mob.getYRot();
+                 mob.yBodyRot = mob.getYRot();
+                 mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), spawnReason, null);
++                if (mob.isSpawnCancelled()) {
++                    // Neo: Discard mob, spawn was cancelled
++                    mob.discard();
++                    // return null, mob was killed, context should be lost
++                    // fixes llamas for wandering trader spawning if wandering trader was cancelled
++                    return null;
++                }
+             }
+ 
+             if (postSpawnConfig != null) {

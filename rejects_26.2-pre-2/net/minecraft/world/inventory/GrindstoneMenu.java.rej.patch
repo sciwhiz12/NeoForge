@@ -1,0 +1,37 @@
+--- a/net/minecraft/world/inventory/GrindstoneMenu.java
++++ b/net/minecraft/world/inventory/GrindstoneMenu.java
+@@ -57,7 +58,7 @@
+ 
+             @Override
+             public boolean mayPlace(ItemStack itemStack) {
+-                return itemStack.isDamageableItem() || EnchantmentHelper.hasAnyEnchantments(itemStack);
++                return itemStack.isDamageableItem() || EnchantmentHelper.hasAnyEnchantments(itemStack) || itemStack.canGrindstoneRepair();
+             }
+         });
+         this.addSlot(new Slot(this.repairSlots, 1, 49, 40) {
+@@ -67,7 +68,7 @@
+ 
+             @Override
+             public boolean mayPlace(ItemStack itemStack) {
+-                return itemStack.isDamageableItem() || EnchantmentHelper.hasAnyEnchantments(itemStack);
++                return itemStack.isDamageableItem() || EnchantmentHelper.hasAnyEnchantments(itemStack) || itemStack.canGrindstoneRepair();
+             }
+         });
+         this.addSlot(new Slot(this.resultSlots, 2, 129, 34) {
+@@ -162,7 +167,7 @@
+             int remaining2 = additional.getMaxDamage() - additional.getDamageValue();
+             int remaining = remaining1 + remaining2 + durability * 5 / 100;
+             int count = 1;
+-            if (!input.isDamageableItem()) {
++            if (!input.isDamageableItem() || !input.isCombineRepairable()) {
+                 if (input.getMaxStackSize() < 2 || !ItemStack.matches(input, additional)) {
+                     return ItemStack.EMPTY;
+                 }
+@@ -174,6 +179,7 @@
+             if (newItem.isDamageableItem()) {
+                 newItem.set(DataComponents.MAX_DAMAGE, durability);
+                 newItem.setDamageValue(Math.max(durability - remaining, 0));
++                if (!additional.isCombineRepairable()) newItem.setDamageValue(input.getDamageValue());
+             }
+ 
+             this.mergeEnchantsFrom(newItem, additional);

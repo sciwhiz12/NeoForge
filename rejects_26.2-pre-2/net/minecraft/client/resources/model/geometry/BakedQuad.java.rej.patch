@@ -1,0 +1,28 @@
+--- a/net/minecraft/client/resources/model/geometry/BakedQuad.java
++++ b/net/minecraft/client/resources/model/geometry/BakedQuad.java
+@@ -59,9 +65,24 @@
+     public @interface MaterialFlags {
+     }
+ 
++    /// @param ambientOcclusion `false` to force-disable AO for this quad
++    ///                            or `true` to use the behavior dictated by
++    ///                            [net.neoforged.neoforge.client.extensions.BlockStateModelPartExtension#ambientOcclusion].
+     @OnlyIn(Dist.CLIENT)
+-    public record MaterialInfo(TextureAtlasSprite sprite, ChunkSectionLayer layer, RenderType itemRenderType, int tintIndex, boolean shade, int lightEmission) {
++    public record MaterialInfo(TextureAtlasSprite sprite, ChunkSectionLayer layer, RenderType itemRenderType, int tintIndex, boolean shade, int lightEmission, boolean ambientOcclusion) {
++        /// @deprecated Neo: use [#MaterialInfo(TextureAtlasSprite, ChunkSectionLayer, RenderType, int, boolean, int, boolean)] instead
++        @Deprecated
++        public MaterialInfo(TextureAtlasSprite sprite, ChunkSectionLayer layer, RenderType itemRenderType, int tintIndex, boolean shade, int lightEmission) {
++            this(sprite, layer, itemRenderType, tintIndex, shade, lightEmission, true);
++        }
++
++        /// @deprecated Neo: use [#of(net.minecraft.client.resources.model.sprite.Material.Baked, com.mojang.blaze3d.platform.Transparency, int, boolean, int, boolean)] instead
++        @Deprecated
+         public static BakedQuad.MaterialInfo of(Material.Baked material, Transparency transparency, int tintIndex, boolean shade, int lightEmission) {
++            return of(material, transparency, tintIndex, shade, lightEmission, true);
++        }
++
++        public static BakedQuad.MaterialInfo of(Material.Baked material, Transparency transparency, int tintIndex, boolean shade, int lightEmission, boolean ambientOcclusion) {
+             ChunkSectionLayer layer = ChunkSectionLayer.byTransparency(transparency);
+             RenderType itemRenderType;
+             if (material.sprite().atlasLocation().equals(TextureAtlas.LOCATION_BLOCKS)) {

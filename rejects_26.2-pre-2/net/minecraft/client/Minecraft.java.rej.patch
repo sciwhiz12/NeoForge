@@ -1,0 +1,250 @@
+--- a/net/minecraft/client/Minecraft.java
++++ b/net/minecraft/client/Minecraft.java
+@@ -466,6 +465,8 @@
+         StringBuilder errorMsgBuilder = new StringBuilder("No supported graphics backend was found.");
+         Window windowCandidate = null;
+         GpuDevice device = null;
++        // Neo: Enable GL debug labels and synchronous GL debug output via FML config
++        boolean enableGlDebug = net.neoforged.fml.loading.FMLConfig.getBoolConfigValue(net.neoforged.fml.loading.FMLConfig.ConfigValue.DEBUG_OPENGL);
+ 
+         for (GpuBackend backend : backends) {
+             try {
+@@ -474,7 +475,7 @@
+                     .createDevice(
+                         windowCandidate.handle(),
+                         (id, type) -> this.getShaderManager().getShader(id, type),
+-                        new GpuDebugOptions(this.options.glDebugVerbosity, SharedConstants.DEBUG_SYNCHRONOUS_GL_LOGS, gameConfig.game.renderDebugLabels)
++                        new GpuDebugOptions(this.options.glDebugVerbosity, SharedConstants.DEBUG_SYNCHRONOUS_GL_LOGS || enableGlDebug, gameConfig.game.renderDebugLabels || enableGlDebug)
+                     );
+                 RenderSystem.initRenderer(device);
+                 break;
+@@ -518,14 +519,16 @@
+                 LOGGER.error("Couldn't set icon", (Throwable)var23);
+             }
+ 
++            // FORGE: Move mouse and keyboard handler setup further below
+             this.mouseHandler = new MouseHandler(this);
+-            this.mouseHandler.setup(this.window);
+             this.keyboardHandler = new KeyboardHandler(this);
+-            this.keyboardHandler.setup(this.window);
+             this.options.applyGraphicsPreset(this.options.graphicsPreset().get());
+             LOGGER.info("Using optional rendering extensions: {}", String.join(", ", RenderSystem.getDevice().getEnabledExtensions()));
+-            this.mainRenderTarget = new MainTarget(this.window.getWidth(), this.window.getHeight());
++            this.mainRenderTarget = net.neoforged.neoforge.client.ClientHooks.instantiateMainTarget(this.window.getWidth(), this.window.getHeight());
+             this.resourceManager = new ReloadableResourceManager(PackType.CLIENT_RESOURCES);
++            net.neoforged.neoforge.client.loading.ClientModLoader.setupModResourcePacks(this.resourcePackRepository);
++            //Move client bootstrap to after mod loading so that events can be fired for it.
++            ClientBootstrap.bootstrap();
+             this.resourcePackRepository.reload();
+             this.options.loadSelectedResourcePacks(this.resourcePackRepository);
+             this.languageManager = new LanguageManager(this.options.languageCode, languageData -> {
+@@ -564,6 +567,7 @@
+             RenderSystem.setupDefaultState();
+             this.window.setErrorSection("Post startup");
+             this.blockColors = BlockColors.createDefault();
++            net.neoforged.neoforge.client.model.UnbakedModelParser.init();
+             this.modelManager = new ModelManager(this.blockColors, this.atlasManager, this.playerSkinRenderCache);
+             this.resourceManager.registerReloadListener(this.modelManager);
+             EquipmentAssetManager equipmentAssets = new EquipmentAssetManager();
+@@ -614,6 +618,7 @@
+             this.resourceManager.registerReloadListener(this.particleResources);
+             this.particleEngine = new ParticleEngine(this.level, this.particleResources);
+             this.particleResources.onReload(this.particleEngine::clearParticles);
++            net.neoforged.neoforge.client.ClientHooks.onRegisterParticleProviders(this.particleResources);
+             this.waypointStyles = new WaypointStyleManager();
+             this.resourceManager.registerReloadListener(this.waypointStyles);
+             this.gameRenderer = new GameRenderer(this, this.entityRenderDispatcher.getItemInHandRenderer(), this.renderBuffers, this.modelManager);
+@@ -633,6 +638,9 @@
+             this.gpuWarnlistManager = new GpuWarnlistManager();
+             this.resourceManager.registerReloadListener(this.gpuWarnlistManager);
+             this.resourceManager.registerReloadListener(this.regionalCompliancies);
++            // NEO: Moved keyboard and mouse handler setup below ingame gui creation to prevent NPEs in them.
++            this.mouseHandler.setup(this.window);
++            this.keyboardHandler.setup(this.window);
+             this.gui = new Gui(this);
+             RealmsClient realmsClient = RealmsClient.getOrCreate(this);
+             this.realmsDataFetcher = new RealmsDataFetcher(realmsClient);
+@@ -665,6 +673,7 @@
+                 }
+             }
+ 
++            net.neoforged.neoforge.client.ClientHooks.initClientHooks(this, this.resourceManager);
+             this.window.updateVsync(this.options.enableVsync().get());
+             this.window.updateRawMouseInput(this.options.rawMouseInput().get());
+             this.window.setAllowCursorChanges(this.options.allowCursorChanges().get());
+@@ -683,6 +692,7 @@
+             TitleScreen.registerTextures(this.textureManager);
+             LoadingOverlay.registerTextures(this.textureManager);
+             this.gameRenderer.registerPanoramaTextures(this.textureManager);
++            net.neoforged.neoforge.client.loading.ClientModLoader.finish();
+             this.setScreen(new GenericMessageScreen(Component.translatable("gui.loadingMinecraft")));
+             List<PackResources> packs = this.resourcePackRepository.openAllSelected();
+             this.reloadStateTracker.startReload(ResourceLoadStateTracker.ReloadReason.INITIAL, packs);
+@@ -691,7 +701,7 @@
+             GameLoadTimesEvent.INSTANCE.beginStep(TelemetryProperty.LOAD_TIME_LOADING_OVERLAY_MS);
+             Minecraft.GameLoadCookie loadCookie = new Minecraft.GameLoadCookie(realmsClient, gameConfig.quickPlay);
+             this.setOverlay(new LoadingOverlay(this, reloadInstance, maybeT -> Util.ifElse(maybeT, t -> this.rollbackResourcePacks(t, loadCookie), () -> {
+-                if (SharedConstants.IS_RUNNING_IN_IDE) {
++                if (SharedConstants.IS_RUNNING_IN_IDE && false /* Neo: Disable self-test */) {
+                     this.selfTest();
+                 }
+ 
+@@ -763,6 +774,8 @@
+             nextStep = () -> this.setScreen(screen);
+         }
+ 
++        nextStep = net.neoforged.neoforge.client.loading.ClientModLoader.completeModLoading(nextStep);
++
+         return nextStep;
+     }
+ 
+@@ -1009,7 +1024,7 @@
+ 
+     public static void crash(@Nullable Minecraft minecraft, File gameDirectory, CrashReport crash) {
+         int exitCode = saveReportAndShutdownSoundManager(minecraft, gameDirectory, crash);
+-        System.exit(exitCode);
++        net.neoforged.neoforge.server.ServerLifecycleHooks.handleExit(exitCode);
+     }
+ 
+     private static int saveReportAndShutdownSoundManager(@Nullable Minecraft minecraft, File gameDirectory, CrashReport crash) {
+@@ -1128,9 +1143,7 @@
+             LOGGER.error("setScreen called from non-game thread");
+         }
+ 
+-        if (this.screen != null) {
+-            this.screen.removed();
+-        } else {
++        if (this.screen == null) {
+             this.setLastInputType(InputType.NONE);
+         }
+ 
+@@ -1152,6 +1165,19 @@
+             }
+         }
+ 
++        net.neoforged.neoforge.client.ClientHooks.clearGuiLayers(this);
++        Screen old = this.screen;
++        if (screen != null) {
++            var event = new net.neoforged.neoforge.client.event.ScreenEvent.Opening(old, screen);
++            if (net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event).isCanceled()) return;
++            screen = event.getNewScreen();
++        }
++
++        if (old != null && screen != old) {
++            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.client.event.ScreenEvent.Closing(old));
++            old.removed();
++        }
++
+         this.screen = screen;
+         if (this.screen != null) {
+             this.screen.added();
+@@ -1180,6 +1206,7 @@
+ 
+     public void destroy() {
+         try {
++            net.neoforged.neoforge.client.ClientLifecycleHooks.handleClientStopping(this);
+             LOGGER.info("Stopping!");
+ 
+             try {
+@@ -1201,6 +1228,7 @@
+             }
+ 
+             this.close();
++            net.neoforged.neoforge.client.ClientLifecycleHooks.handleClientStopped(this);
+         } finally {
+             Util.timeSource = System::nanoTime;
+             if (!this.hasDelayedCrash()) {
+@@ -1304,9 +1332,13 @@
+ 
+         this.window.setErrorSection("Post render");
+         boolean previouslyPaused = this.pause;
+-        this.pause = this.hasSingleplayerServer()
++        boolean pause = this.hasSingleplayerServer()
+             && (this.screen != null && this.screen.isPauseScreen() || this.overlay != null && this.overlay.isPauseScreen())
+             && !this.singleplayerServer.isPublished();
++        if (pause != this.pause && !net.neoforged.neoforge.client.ClientHooks.onClientPauseChangePre(pause)) {
++            this.pause = pause;
++            net.neoforged.neoforge.client.ClientHooks.onClientPauseChangePost(pause);
++        }
+         if (!previouslyPaused && this.pause) {
+             this.soundManager.pauseAllExcept(SoundSource.MUSIC, SoundSource.UI);
+         }
+@@ -1346,7 +1378,9 @@
+         profiler.popPush("gpuAsync");
+         RenderSystem.executePendingTasks();
+         profiler.pop();
++        net.neoforged.neoforge.client.ClientHooks.fireRenderFramePre(this.deltaTracker);
+         this.gameRenderer.render(this.deltaTracker, advanceGameTime);
++        net.neoforged.neoforge.client.ClientHooks.fireRenderFramePost(this.deltaTracker);
+         profiler.push("present");
+         if (!this.gameRenderer.getGameRenderState().windowRenderState.isMinimized) {
+             this.mainRenderTarget.blitToScreen();
+@@ -1670,9 +1715,16 @@
+                 return false;
+             } else {
+                 boolean endAttack = false;
++                var inputEvent = net.neoforged.neoforge.client.ClientHooks.onClickInput(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
++                if (inputEvent.isCanceled()) {
++                    if (inputEvent.shouldSwingHand())
++                        this.player.swing(InteractionHand.MAIN_HAND);
++                    return endAttack;
++                }
+                 PiercingWeapon piercingWeapon = heldItem.get(DataComponents.PIERCING_WEAPON);
+                 if (piercingWeapon != null) {
+                     this.gameMode.piercingAttack(piercingWeapon);
++                    if (inputEvent.shouldSwingHand())
+                     this.player.swing(InteractionHand.MAIN_HAND);
+                     return true;
+                 } else {
+@@ -1699,8 +1751,10 @@
+                             }
+ 
+                             this.player.resetAttackStrengthTicker();
++                            net.neoforged.neoforge.common.CommonHooks.onEmptyLeftClick(this.player);
+                     }
+ 
++                    if (inputEvent.shouldSwingHand())
+                     this.player.swing(InteractionHand.MAIN_HAND);
+                     return endAttack;
+                 }
+@@ -2199,13 +2272,16 @@
+         IntegratedServer server = this.singleplayerServer;
+         this.singleplayerServer = null;
+         this.gameRenderer.resetData();
++        net.neoforged.neoforge.client.ClientHooks.firePlayerLogout(this.gameMode, this.player);
+         this.gameMode = null;
+         this.narrator.clear();
+         this.clientLevelTeardownInProgress = true;
+ 
++        var shouldRevertRegistriesToFrozen = this.getConnection() != null && this.getConnection().getConnection() != null; // Neo: Track whether to revert registries after disconnect
+         try {
+             if (this.level != null) {
+                 this.gui.onDisconnected();
++                net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.LevelEvent.Unload(this.level));
+             }
+ 
+             this.level = null;
+@@ -2229,6 +2305,7 @@
+         } finally {
+             this.clientLevelTeardownInProgress = false;
+         }
++        if(shouldRevertRegistriesToFrozen) net.neoforged.neoforge.registries.RegistryManager.revertToFrozen(); // Neo: Revert registries to frozen on disconnect
+     }
+ 
+     public void clearDownloadedResourcePacks() {
+@@ -2438,7 +2517,14 @@
+         systemReport.setDetail("Backend API", RenderSystem::getApiDescription);
+         systemReport.setDetail("Window size", () -> minecraft != null ? minecraft.window.getWidth() + "x" + minecraft.window.getHeight() : "<not initialized>");
+         systemReport.setDetail("GFLW Platform", Window::getPlatform);
+-        systemReport.setDetail("Render Extensions", () -> String.join(", ", RenderSystem.getDevice().getEnabledExtensions()));
++        systemReport.setDetail("Render Extensions", () -> {
++            GpuDevice device = RenderSystem.tryGetDevice();
++            if (device == null) {
++                return "<no renderer available>";
++            } else {
++                return String.join(", ", device.getEnabledExtensions());
++            }
++        });
+         systemReport.setDetail("GL debug messages", () -> {
+             GpuDevice device = RenderSystem.tryGetDevice();
+             if (device == null) {

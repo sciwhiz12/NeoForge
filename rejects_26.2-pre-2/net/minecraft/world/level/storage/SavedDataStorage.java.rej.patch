@@ -1,0 +1,42 @@
+--- a/net/minecraft/world/level/storage/SavedDataStorage.java
++++ b/net/minecraft/world/level/storage/SavedDataStorage.java
+@@ -67,7 +76,7 @@
+         if (data != null) {
+             return data;
+         } else {
+-            T newData = (T)type.constructor().get();
++            T newData = (T)type.factory().create(this.level);
+             this.set(type, newData);
+             return newData;
+         }
+@@ -106,7 +115,7 @@
+         data.setDirty();
+     }
+ 
+-    public CompoundTag readTagFromDisk(Path dataFile, DataFixTypes type, int newVersion) throws IOException {
++    public CompoundTag readTagFromDisk(Path dataFile, @Nullable DataFixTypes type, int newVersion) throws IOException {
+         CompoundTag var8;
+         try (
+             InputStream in = Files.newInputStream(dataFile);
+@@ -121,9 +130,19 @@
+                 }
+             }
+ 
+-            int version = NbtUtils.getDataVersion(tag, 1343);
+-            var8 = type.update(this.fixerUpper, tag, version, newVersion);
++            if (type != null) {
++                int version = NbtUtils.getDataVersion(tag, 1343);
++                var8 = type.update(this.fixerUpper, tag, version, newVersion);
++            } else {
++                var8 = tag;
++            }
+         }
++
++        // Neo: delete any temporary files so that we don't inflate disk space unnecessarily.
++        this.pendingWriteFuture = this.pendingWriteFuture.thenRunAsync(
++                () -> net.neoforged.neoforge.common.IOUtilities.tryCleanupTempFiles(this.dataFolder, dataFile.getFileName().toString()),
++                Util.ioPool()
++        );
+ 
+         return var8;
+     }

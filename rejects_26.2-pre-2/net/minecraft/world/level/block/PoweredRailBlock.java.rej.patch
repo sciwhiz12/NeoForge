@@ -1,0 +1,33 @@
+--- a/net/minecraft/world/level/block/PoweredRailBlock.java
++++ b/net/minecraft/world/level/block/PoweredRailBlock.java
+@@ -35,7 +46,7 @@
+             int y = pos.getY();
+             int z = pos.getZ();
+             boolean checkBelow = true;
+-            RailShape shape = state.getValue(SHAPE);
++            RailShape shape = ((BaseRailBlock)state.getBlock()).getRailDirection(state, level, pos, null);
+             switch (shape) {
+                 case NORTH_SOUTH:
+                     if (forward) {
+@@ -104,17 +115,17 @@
+ 
+     protected boolean isSameRailWithPower(Level level, BlockPos pos, boolean forward, int searchDepth, RailShape dir) {
+         BlockState state = level.getBlockState(pos);
+-        if (!state.is(this)) {
++        if (!(state.getBlock() instanceof PoweredRailBlock other)) {
+             return false;
+         } else {
+-            RailShape myShape = state.getValue(SHAPE);
++            RailShape myShape = other.getRailDirection(state, level, pos, null);
+             if (dir != RailShape.EAST_WEST || myShape != RailShape.NORTH_SOUTH && myShape != RailShape.ASCENDING_NORTH && myShape != RailShape.ASCENDING_SOUTH) {
+                 if (dir != RailShape.NORTH_SOUTH
+                     || myShape != RailShape.EAST_WEST && myShape != RailShape.ASCENDING_EAST && myShape != RailShape.ASCENDING_WEST) {
+-                    if (!state.getValue(POWERED)) {
++                    if (isActivatorRail() != other.isActivatorRail()) {
+                         return false;
+                     } else {
+-                        return level.hasNeighborSignal(pos) ? true : this.findPoweredRailSignal(level, pos, state, forward, searchDepth + 1);
++                        return level.hasNeighborSignal(pos) ? true : other.findPoweredRailSignal(level, pos, state, forward, searchDepth + 1);
+                     }
+                 } else {
+                     return false;

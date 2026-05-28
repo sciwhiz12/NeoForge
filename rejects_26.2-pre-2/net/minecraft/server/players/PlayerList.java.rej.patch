@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -813,7 +835,7 @@
+     }
+ 
+     public List<ServerPlayer> getPlayers() {
+-        return this.players;
++        return this.playersView; // Neo: Return an unmodifiable view, we don't want people removing things without us knowing.
+     }
+ 
+     public @Nullable ServerPlayer getPlayer(UUID uuid) {

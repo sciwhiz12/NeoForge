@@ -1,0 +1,15 @@
+--- a/com/mojang/blaze3d/pipeline/MainTarget.java
++++ b/com/mojang/blaze3d/pipeline/MainTarget.java
+@@ -18,7 +18,11 @@
+     private static final MainTarget.Dimension DEFAULT_DIMENSIONS = new MainTarget.Dimension(854, 480);
+ 
+     public MainTarget(int desiredWidth, int desiredHeight) {
+-        super("Main", true);
++        this(desiredWidth, desiredHeight, false);
++    }
++
++    public MainTarget(int desiredWidth, int desiredHeight, boolean enableStencil) {
++        super("Main", true, enableStencil);
+         this.createFrameBuffer(desiredWidth, desiredHeight);
+     }
+ 

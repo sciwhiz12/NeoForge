@@ -1,0 +1,39 @@
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -389,6 +389,7 @@
+                 this.modified = true;
+             }
+ 
++            net.neoforged.neoforge.event.EventHooks.fireChunkTicketLevelUpdated(this.level, node, oldLevel, level, chunk);
+             return chunk;
+         }
+     }
+@@ -759,6 +765,7 @@
+                 Profiler.get().incrementCounter("chunkSave");
+                 this.activeChunkWrites.incrementAndGet();
+                 SerializableChunkData data = SerializableChunkData.copyOf(this.level, chunk);
++                net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.ChunkDataEvent.Save(chunk, this.level, data));
+                 CompletableFuture<CompoundTag> encodedData = CompletableFuture.supplyAsync(data::write, Util.backgroundExecutor());
+                 this.write(pos, encodedData::join).handle((ignored, throwable) -> {
+                     if (throwable != null) {
+@@ -1291,6 +1314,20 @@
+         }
+     }
+ 
++    // Neo: Getter for players watching an entity.
++    public List<ServerPlayer> getPlayersWatching(Entity entity) {
++        var trackedEntity = entityMap.get(entity.getId());
++        if (trackedEntity != null) {
++            var ret = new java.util.ArrayList<ServerPlayer>(trackedEntity.seenBy.size());
++            for (var connection : trackedEntity.seenBy) {
++                ret.add(connection.getPlayer());
++            }
++            return java.util.Collections.unmodifiableList(ret);
++        } else {
++            return List.of();
++        }
++    }
++
+     private class DistanceManager extends net.minecraft.server.level.DistanceManager {
+         protected DistanceManager(TicketStorage ticketStorage, Executor executor, Executor mainThreadExecutor) {
+             Objects.requireNonNull(ChunkMap.this);

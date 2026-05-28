@@ -1,0 +1,15 @@
+--- a/net/minecraft/data/tags/TagsProvider.java
++++ b/net/minecraft/data/tags/TagsProvider.java
+@@ -91,8 +117,10 @@
+                                             )
+                                         );
+                                     } else {
+-                                        Path path = this.pathProvider.json(id);
+-                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(entries, builder.shouldReplace()), path);
++                                        Path path = this.getPath(id);
++                                        if (path == null) return CompletableFuture.completedFuture(null); // Neo: Allow running this data provider without writing it. Recipe provider needs valid tags.
++                                        var removed = builder.getRemoveEntries().toList();
++                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(entries, builder.shouldReplace(), removed), path);
+                                     }
+                                 }
+                             )

@@ -1,0 +1,18 @@
+--- a/net/minecraft/server/packs/repository/Pack.java
++++ b/net/minecraft/server/packs/repository/Pack.java
+@@ -64,7 +102,14 @@
+                 PackCompatibility packCompatibility = PackCompatibility.forVersion(meta.supportedFormats(), currentPackVersion);
+                 OverlayMetadataSection overlays = pack.getMetadataSection(OverlayMetadataSection.forPackType(type));
+                 List<String> overlaySet = overlays != null ? overlays.overlaysForVersion(currentPackVersion) : List.of();
+-                var11 = new Pack.Metadata(meta.description(), packCompatibility, requiredFlags, overlaySet);
++                // Neo: add `neoforge:overlays` overlays as well
++                var neoOverlays = pack.getMetadataSection(OverlayMetadataSection.forPackTypeNeoForge(type));
++                if (neoOverlays != null) {
++                    overlaySet = new java.util.ArrayList<>(overlaySet);
++                    overlaySet.addAll(neoOverlays.overlaysForVersion(currentPackVersion));
++                    overlaySet = List.copyOf(overlaySet);
++                }
++                var11 = new Pack.Metadata(meta.description(), packCompatibility, requiredFlags, overlaySet, pack.isHidden());
+             }
+ 
+             return var11;

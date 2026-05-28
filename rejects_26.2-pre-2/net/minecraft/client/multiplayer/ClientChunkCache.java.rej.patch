@@ -1,0 +1,10 @@
+--- a/net/minecraft/client/multiplayer/ClientChunkCache.java
++++ b/net/minecraft/client/multiplayer/ClientChunkCache.java
+@@ -124,6 +125,7 @@
+             }
+ 
+             this.level.onChunkLoaded(pos);
++            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.ChunkEvent.Load(chunk, false));
+             return chunk;
+         }
+     }

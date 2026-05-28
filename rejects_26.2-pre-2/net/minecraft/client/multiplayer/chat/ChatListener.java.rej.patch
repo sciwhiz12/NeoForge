@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/multiplayer/chat/ChatListener.java
++++ b/net/minecraft/client/multiplayer/chat/ChatListener.java
+@@ -205,6 +211,8 @@
+ 
+     public void handleSystemMessage(Component message, boolean remote) {
+         if (!this.minecraft.options.hideMatchedNames().get() || !this.minecraft.isBlocked(this.guessChatUUID(message))) {
++            message = net.neoforged.neoforge.client.ClientHooks.onClientSystemChat(message, false);
++            if (message == null) return;
+             LocalPlayer receiver = this.minecraft.player;
+             if (receiver != null && receiver.chatAbilities().canReceiveSystemMessages()) {
+                 if (remote) {

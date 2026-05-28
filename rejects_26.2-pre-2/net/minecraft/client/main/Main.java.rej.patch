@@ -1,0 +1,12 @@
+--- a/net/minecraft/client/main/Main.java
++++ b/net/minecraft/client/main/Main.java
+@@ -186,7 +189,8 @@
+                     disableChat,
+                     captureTracyImages,
+                     renderDebugLabels,
+-                    optionSet.has(offlineDeveloperMode)
++                    // Neo: Auto-enable offlineDeveloperMode if no accessToken is passed in dev
++                    optionSet.has(offlineDeveloperMode) || !optionSet.has(accessTokenOption)
+                 ),
+                 new GameConfig.QuickPlayData(quickPlayLogPath, quickPlayVariant)
+             );

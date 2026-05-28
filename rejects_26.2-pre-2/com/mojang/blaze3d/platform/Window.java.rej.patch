@@ -1,0 +1,14 @@
+--- a/com/mojang/blaze3d/platform/Window.java
++++ b/com/mojang/blaze3d/platform/Window.java
+@@ -226,8 +241,10 @@
+     }
+ 
+     public void defaultErrorCallback(int errorCode, long description) {
+-        RenderSystem.assertOnRenderThread();
+         String errorString = MemoryUtil.memUTF8(description);
++        if (!RenderSystem.isOnRenderThread()) {
++            throw new IllegalStateException("Encountered GL error off-thread @ " + errorSection + ": " + errorCode + ": " + errorString);
++        }
+         LOGGER.error("########## GL ERROR ##########");
+         LOGGER.error("@ {}", this.errorSection);
+         LOGGER.error("{}: {}", errorCode, errorString);

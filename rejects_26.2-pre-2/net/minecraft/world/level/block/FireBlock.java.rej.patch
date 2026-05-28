@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/level/block/FireBlock.java
++++ b/net/minecraft/world/level/block/FireBlock.java
+@@ -274,7 +273,7 @@
+ 
+             for (Direction direction : Direction.values()) {
+                 BlockState blockState = level.getBlockState(pos.relative(direction));
+-                odds = Math.max(this.getIgniteOdds(blockState), odds);
++                odds = Math.max(blockState.getFireSpreadSpeed(level, pos.relative(direction), direction.getOpposite()), odds);
+             }
+ 
+             return odds;

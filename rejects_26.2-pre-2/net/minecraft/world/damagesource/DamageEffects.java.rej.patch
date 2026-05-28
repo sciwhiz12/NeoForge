@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/damagesource/DamageEffects.java
++++ b/net/minecraft/world/damagesource/DamageEffects.java
+@@ -5,6 +5,8 @@
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.util.StringRepresentable;
+ 
++@net.neoforged.fml.common.asm.enumextension.NamedEnum
++@net.neoforged.fml.common.asm.enumextension.NetworkedEnum(net.neoforged.fml.common.asm.enumextension.NetworkedEnum.NetworkCheck.CLIENTBOUND)
+ public enum DamageEffects implements StringRepresentable, net.neoforged.fml.common.asm.enumextension.IExtensibleEnum {
+     HURT("hurt", SoundEvents.PLAYER_HURT),
+     THORNS("thorns", SoundEvents.PLAYER_HURT),

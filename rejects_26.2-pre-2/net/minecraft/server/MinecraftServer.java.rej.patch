@@ -1,0 +1,43 @@
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -352,9 +352,9 @@
+             this.structureTemplateManager = new StructureTemplateManager(worldStem.resourceManager(), storageSource, fixerUpper, blockLookup);
+             this.serverThread = serverThread;
+             this.executor = Util.backgroundExecutor();
+-            this.potionBrewing = PotionBrewing.bootstrap(this.worldData.enabledFeatures());
++            this.potionBrewing = PotionBrewing.bootstrap(this.worldData.enabledFeatures(), this.registryAccess());
+             this.resources.managers.getRecipeManager().finalizeRecipeLoading(this.worldData.enabledFeatures());
+-            this.fuelValues = FuelValues.vanillaBurnTimes(this.registries.compositeAccess(), this.worldData.enabledFeatures());
++            this.fuelValues = net.neoforged.neoforge.common.DataMapHooks.populateFuelValues(this.registries.compositeAccess(), this.worldData.enabledFeatures());
+             this.tickFrame = TracyClient.createDiscontinuousFrame("Server Tick");
+             this.notificationManager = new NotificationManager();
+             this.serverActivityMonitor = new ServerActivityMonitor(this.notificationManager, 30);
+@@ -684,6 +688,7 @@
+         for (ServerLevel levelx : this.getAllLevels()) {
+             if (levelx != null) {
+                 try {
++                    net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.LevelEvent.Unload(levelx));
+                     levelx.close();
+                 } catch (IOException var5) {
+                     LOGGER.error("Exception closing the level", (Throwable)var5);
+@@ -1574,8 +1607,10 @@
+         FeatureFlagSet forcedFeatures = initMode ? FeatureFlagSet.of() : initialDataConfig.enabledFeatures();
+         FeatureFlagSet allowedFeatures = initMode ? FeatureFlags.REGISTRY.allFlags() : initialDataConfig.enabledFeatures();
+         packRepository.reload();
++        DataPackConfig.DEFAULT.addModPacks(net.neoforged.neoforge.common.CommonHooks.getModDataPacks());
++        dataPackConfig.addModPacks(net.neoforged.neoforge.common.CommonHooks.getModDataPacks());
+         if (safeMode) {
+-            return configureRepositoryWithSelection(packRepository, List.of("vanilla"), forcedFeatures, false);
++            return configureRepositoryWithSelection(packRepository, net.neoforged.neoforge.common.CommonHooks.getModDataPacksWithVanilla(), forcedFeatures, false);
+         } else {
+             Set<String> selected = Sets.newLinkedHashSet();
+ 
+@@ -1621,6 +1656,8 @@
+                 selected.add("vanilla");
+             }
+ 
++            net.neoforged.neoforge.resource.ResourcePackLoader.reorderNewlyDiscoveredPacks(selected, dataPackConfig.getEnabled(), packRepository);
++
+             return configureRepositoryWithSelection(packRepository, selected, forcedFeatures, true);
+         }
+     }

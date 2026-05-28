@@ -1,0 +1,34 @@
+--- a/net/minecraft/core/RegistrySetBuilder.java
++++ b/net/minecraft/core/RegistrySetBuilder.java
+@@ -187,16 +191,22 @@
+                 holder.supplier = () -> cloner.clone((T)elementHolder.value(), patchProvider, targetProvider.get());
+                 entries.put(elementKey, holder);
+             });
+-            HolderLookup.RegistryLookup<T> fallbackContents = fallbackProvider.lookupOrThrow(registryKey);
+-            fallbackContents.listElements().forEach(elementHolder -> {
+-                ResourceKey<T> elementKey = elementHolder.key();
+-                entries.computeIfAbsent(elementKey, key -> {
+-                    RegistrySetBuilder.LazyHolder<T> holder = new RegistrySetBuilder.LazyHolder<>(owner, elementKey);
+-                    holder.supplier = () -> cloner.clone((T)elementHolder.value(), fallbackProvider, targetProvider.get());
+-                    return holder;
++            Optional<? extends HolderLookup.RegistryLookup<T>> fallbackContents = fallbackProvider.lookup(registryKey);
++            Lifecycle lifecycle;
++            if (fallbackContents.isPresent()) {
++                HolderLookup.RegistryLookup<T> registrylookup1 = fallbackContents.get();
++                registrylookup1.listElements().forEach(elementHolder -> {
++                    ResourceKey<T> elementKey = elementHolder.key();
++                    entries.computeIfAbsent(elementKey, key -> {
++                        RegistrySetBuilder.LazyHolder<T> holder = new RegistrySetBuilder.LazyHolder<>(owner, elementKey);
++                        holder.supplier = () -> cloner.clone((T) elementHolder.value(), fallbackProvider, targetProvider.get());
++                        return holder;
++                    });
+                 });
+-            });
+-            Lifecycle lifecycle = patchContents.registryLifecycle().add(fallbackContents.registryLifecycle());
++                lifecycle = patchContents.registryLifecycle().add(registrylookup1.registryLifecycle());
++            } else {
++                lifecycle = patchContents.registryLifecycle();
++            }
+             return lookupFromMap(registryKey, lifecycle, owner, entries);
+         }
+     }

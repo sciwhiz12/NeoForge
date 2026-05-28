@@ -1,0 +1,10 @@
+--- a/net/minecraft/world/level/TicketStorage.java
++++ b/net/minecraft/world/level/TicketStorage.java
+@@ -259,6 +263,7 @@
+                 if (ticket.getType().equals(TicketType.FORCED)) {
+                     this.updateForcedChunks();
+                 }
++                if (ticket.getType().forceNaturalSpawning()) this.updateForcedNaturalSpawning();
+ 
+                 this.setDirty();
+                 return true;
