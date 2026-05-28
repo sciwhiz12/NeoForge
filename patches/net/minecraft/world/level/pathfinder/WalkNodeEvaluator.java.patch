@@ -22,3 +22,21 @@
          Block block = blockState.getBlock();
          if (blockState.isAir()) {
              return PathType.OPEN;
+@@ -531,6 +_,8 @@
+ 
+         if (!blockState.is(Blocks.WITHER_ROSE) && !blockState.is(BlockTags.SPELEOTHEMS)) {
+             FluidState fluidState = blockState.getFluidState();
++            PathType nonLoggableFluidPathType = fluidState.getBlockPathType(level, pos, null, false);
++            if (nonLoggableFluidPathType != null) return nonLoggableFluidPathType;
+             if (fluidState.is(FluidTags.LAVA)) {
+                 return PathType.LAVA;
+             }
+@@ -560,6 +_,8 @@
+                     if (!blockState.isPathfindable(PathComputationType.LAND)) {
+                         return PathType.BLOCKED;
+                     } else {
++                        PathType loggableFluidPathType = fluidState.getBlockPathType(level, pos, null, true);
++                        if (loggableFluidPathType != null) return loggableFluidPathType;
+                         return fluidState.is(FluidTags.WATER) ? PathType.WATER : PathType.OPEN;
+                     }
+                 } else {

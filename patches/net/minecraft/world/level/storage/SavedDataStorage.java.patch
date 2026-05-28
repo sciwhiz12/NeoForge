@@ -18,6 +18,15 @@
          this.fixerUpper = fixerUpper;
          this.dataFolder = dataFolder;
          this.registries = registries;
+@@ -68,7 +_,7 @@
+             return data;
+         }
+ 
+-        T newData = (T)type.constructor().get();
++        T newData = (T)type.factory().create(this.level);
+         this.set(type, newData);
+         return newData;
+     }
 @@ -89,7 +_,7 @@
              if (Files.exists(file)) {
                  CompoundTag tag = this.readTagFromDisk(file, type.dataFixType(), SharedConstants.getCurrentVersion().dataVersion().version());
@@ -27,6 +36,31 @@
                      .parse(ops, tag.get("data"))
                      .resultOrPartial(error -> LOGGER.error("Failed to parse saved data for '{}': {}", type, error))
                      .orElse(null);
+@@ -106,7 +_,7 @@
+         data.setDirty();
+     }
+ 
+-    public CompoundTag readTagFromDisk(Path dataFile, DataFixTypes type, int newVersion) throws IOException {
++    public CompoundTag readTagFromDisk(Path dataFile, @Nullable DataFixTypes type, int newVersion) throws IOException {
+         try (
+             InputStream in = Files.newInputStream(dataFile);
+             PushbackInputStream inputStream = new PushbackInputStream(new FastBufferedInputStream(in), 2);
+@@ -121,7 +_,15 @@
+             }
+ 
+             int version = NbtUtils.getDataVersion(tag, 1343);
++            if (type != null)
+             return type.update(this.fixerUpper, tag, version, newVersion);
++            else return tag;
++        } finally {
++            // Neo: delete any temporary files so that we don't inflate disk space unnecessarily.
++            this.pendingWriteFuture = this.pendingWriteFuture.thenRunAsync(
++                () -> net.neoforged.neoforge.common.IOUtilities.tryCleanupTempFiles(this.dataFolder, dataFile.getFileName().toString()),
++                Util.ioPool()
++            );
+         }
+     }
+ 
 @@ -196,7 +_,7 @@
      }
  

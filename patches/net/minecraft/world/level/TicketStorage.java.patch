@@ -27,6 +27,14 @@
  
          this.setDirty();
          return true;
+@@ -261,6 +_,7 @@
+         if (ticket.getType().equals(TicketType.FORCED)) {
+             this.updateForcedChunks();
+         }
++        if (ticket.getType().forceNaturalSpawning()) this.updateForcedNaturalSpawning();
+ 
+         this.setDirty();
+         return true;
 @@ -303,11 +_,14 @@
  
      public void deactivateTicketsOnClosing() {
