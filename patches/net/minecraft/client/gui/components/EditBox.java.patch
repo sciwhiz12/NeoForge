@@ -1,5 +1,13 @@
 --- a/net/minecraft/client/gui/components/EditBox.java
 +++ b/net/minecraft/client/gui/components/EditBox.java
+@@ -60,6 +_,7 @@
+     private long focusedTime = Util.getMillis();
+     private int textX;
+     private int textY;
++    private java.util.function.Predicate<String> filter = _ -> true; // Neo: Add back text input filtering
+ 
+     public EditBox(Font font, Component narration) {
+         this(font, 150, 20, narration);
 @@ -98,6 +_,8 @@
      }
  

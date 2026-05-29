@@ -53,14 +53,31 @@
      }
  
      protected void fadeWidgets(float widgetFade) {
-@@ -464,6 +_,10 @@
+@@ -466,6 +_,10 @@
+     public void onFilesDrop(List<Path> files) {
      }
  
-     public void onFilesDrop(List<Path> files) {
-+    }
-+
 +    public Minecraft getMinecraft() {
 +        return this.minecraft;
++    }
++
+     private void scheduleNarration(long delay, boolean ignoreSuppression) {
+         this.nextNarrationTime = Util.getMillis() + delay;
+         if (ignoreSuppression) {
+@@ -613,6 +_,16 @@
+ 
+     public @Nullable Music getBackgroundMusic() {
+         return null;
++    }
++
++    private void addEventWidget(GuiEventListener listener) {
++        if (listener instanceof Renderable r) {
++            this.renderables.add(r);
++        }
++        if (listener instanceof NarratableEntry ne) {
++            this.narratables.add(ne);
++        }
++        children.add(listener);
      }
  
-     private void scheduleNarration(long delay, boolean ignoreSuppression) {
+     public record NarratableSearchResult(NarratableEntry entry, int index, NarratableEntry.NarrationPriority priority) {

@@ -9,6 +9,21 @@
  
      public CreativeModeInventoryScreen(LocalPlayer player, FeatureFlagSet enabledFeatures, boolean displayOperatorCreativeTab) {
          super(new CreativeModeInventoryScreen.ItemPickerMenu(player), player.getInventory(), CommonComponents.EMPTY, 195, 136);
+@@ -153,9 +_,11 @@
+         }
+ 
+         if (searchTrees != null) {
+-            List<ItemStack> creativeSearchItems = List.copyOf(CreativeModeTabs.searchTab().getDisplayItems());
+-            searchTrees.updateCreativeTooltips(holders, creativeSearchItems);
+-            searchTrees.updateCreativeTags(creativeSearchItems);
++            CreativeModeTabs.allTabs().stream().filter(net.minecraft.world.item.CreativeModeTab::hasSearchBar).forEach(tab -> {
++                List<ItemStack> list = List.copyOf(tab.getDisplayItems());
++                searchTrees.updateCreativeTooltips(holders, list, net.neoforged.neoforge.client.CreativeModeTabSearchRegistry.getNameSearchKey(tab));
++                searchTrees.updateCreativeTags(list, net.neoforged.neoforge.client.CreativeModeTabSearchRegistry.getTagSearchKey(tab));
++            });
+         }
+ 
+         return true;
 @@ -164,7 +_,7 @@
      private void refreshCurrentTabContents(Collection<ItemStack> displayList) {
          int oldRowIndex = this.menu.getRowIndexForScroll(this.scrollOffs);
@@ -53,6 +68,15 @@
              this.searchBox = new EditBox(this.font, this.leftPos + 82, this.topPos + 6, 80, 9, Component.translatable("itemGroup.search"));
              this.searchBox.setMaxLength(50);
              this.searchBox.setBordered(false);
+@@ -379,7 +_,7 @@
+             return false;
+         }
+ 
+-        if (selectedTab.getType() != CreativeModeTab.Type.SEARCH) {
++        if (!selectedTab.hasSearchBar()) {
+             return false;
+         }
+ 
 @@ -407,7 +_,7 @@
      @Override
      public boolean keyPressed(KeyEvent event) {
@@ -144,6 +168,28 @@
                  break;
              }
          }
+@@ -704,10 +_,10 @@
+     public List<Component> getTooltipFromContainerItem(ItemStack itemStack) {
+         boolean isCreativeSlot = this.hoveredSlot != null && this.hoveredSlot instanceof CreativeModeInventoryScreen.CustomCreativeSlot;
+         boolean isSingleCategoryTab = selectedTab.getType() == CreativeModeTab.Type.CATEGORY;
+-        boolean isSearchTab = selectedTab.getType() == CreativeModeTab.Type.SEARCH;
++        boolean isSearchTab = selectedTab.hasSearchBar();
+         TooltipFlag.Default originalTooltipStyle = this.minecraft.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
+         TooltipFlag tooltipStyle = isCreativeSlot ? originalTooltipStyle.asCreative() : originalTooltipStyle;
+-        List<Component> originalLines = itemStack.getTooltipLines(Item.TooltipContext.of(this.minecraft.level), this.minecraft.player, tooltipStyle);
++        List<Component> originalLines = itemStack.getTooltipLines(Item.TooltipContext.of(this.minecraft.level, this.minecraft.player), this.minecraft.player, net.neoforged.neoforge.client.ClientTooltipFlag.of(tooltipStyle));
+         if (originalLines.isEmpty()) {
+             return originalLines;
+         }
+@@ -728,7 +_,7 @@
+         int i = 1;
+ 
+         for (CreativeModeTab tab : CreativeModeTabs.tabs()) {
+-            if (tab.getType() != CreativeModeTab.Type.SEARCH && tab.contains(itemStack)) {
++            if (!tab.hasSearchBar() && tab.contains(itemStack)) {
+                 linesToDisplay.add(i++, tab.getDisplayName().copy().withStyle(ChatFormatting.BLUE));
+             }
+         }
 @@ -740,7 +_,7 @@
      public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
          super.extractBackground(graphics, mouseX, mouseY, a);
@@ -204,6 +250,21 @@
          graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprites[Mth.clamp(pos, 0, sprites.length)], x, y, 26, 32);
          int iconX = x + 13 - 8;
          int iconY = y + 16 - 8 + (isTop ? 1 : -1);
+@@ -875,6 +_,14 @@
+         }
+     }
+ 
++    public net.neoforged.neoforge.client.gui.CreativeTabsScreenPage getCurrentPage() {
++        return currentPage;
++    }
++
++    public void setCurrentPage(net.neoforged.neoforge.client.gui.CreativeTabsScreenPage currentPage) {
++        this.currentPage = currentPage;
++    }
++
+     private static class CustomCreativeSlot extends Slot {
+         public CustomCreativeSlot(Container container, int slot, int x, int y) {
+             super(container, slot, x, y);
 @@ -1052,6 +_,22 @@
          @Override
          public boolean mayPickup(Player player) {

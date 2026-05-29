@@ -276,7 +276,7 @@
   "net/minecraft/client/renderer/chunk/SectionRenderDispatcher$RenderSection": [
     "net/neoforged/neoforge/client/IRenderableSection"
   ],
-  "net/minecraft/client/gui/Gui$HeartType": [
+  "net/minecraft/client/gui/Hud$HeartType": [
     "net/neoforged/fml/common/asm/enumextension/IExtensibleEnum"
   ],
   "net/minecraft/client/gui/font/providers/GlyphProviderType": [
