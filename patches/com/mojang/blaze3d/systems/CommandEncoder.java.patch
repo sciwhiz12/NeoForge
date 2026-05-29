@@ -16,12 +16,10 @@
      public void writeToBuffer(GpuBufferSlice destination, ByteBuffer data) {
          if (this.isInRenderPass) {
              throw new IllegalStateException("Close the existing render pass before performing additional commands");
-@@ -576,7 +_,26 @@
-             if (destination.getDepthOrLayers() > 1) {
+@@ -577,6 +_,25 @@
                  throw new UnsupportedOperationException("Textures with multiple depths or layers are not yet supported for copying");
              }
--
-+
+ 
 +            final var sourceFormat = source.getFormat();
 +            final var destFormat = destination.getFormat();
 +            if (sourceFormat.hasDepthAspect() || sourceFormat.hasStencilAspect()) {

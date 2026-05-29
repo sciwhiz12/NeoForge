@@ -24,11 +24,13 @@
                  descriptor.label()
              );
          }
-@@ -428,7 +_,22 @@
-             this.memoryBarrier(stack);
-         }
-     }
--
+@@ -425,6 +_,21 @@
+     public void clearDepthTexture(GpuTexture depthTexture, double clearDepth) {
+         try (MemoryStack stack = MemoryStack.stackPush()) {
+             this.clearDepthTextureUnsynced(stack, depthTexture, clearDepth);
++            this.memoryBarrier(stack);
++        }
++    }
 +
 +    @Override
 +    public void clearStencilTexture(GpuTexture texture, int value) {
@@ -41,10 +43,6 @@
 +            subresourceRange.layerCount(1);
 +            subresourceRange.aspectMask(VK12.VK_IMAGE_ASPECT_STENCIL_BIT);
 +            VK12.vkCmdClearDepthStencilImage(this.commandBuffer(), ((VulkanGpuTexture)texture).vkImage(), 1, vkClearStencil, subresourceRange);
-+            this.memoryBarrier(stack);
-+        }
-+    }
-+
-     @Override
-     public void writeToBuffer(GpuBufferSlice destination, ByteBuffer data) {
-         VulkanGpuBuffer destBuffer = (VulkanGpuBuffer)destination.buffer();
+             this.memoryBarrier(stack);
+         }
+     }
