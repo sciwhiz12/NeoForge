@@ -4,14 +4,14 @@
          return Objects.hash(this.matrix);
      }
  
-+    private Matrix3f normalTransform = null;
++    private org.joml.Matrix3f normalTransform = null;
 +    public org.joml.Matrix3fc getNormalMatrix() {
 +        checkNormalTransform();
 +        return normalTransform;
 +    }
 +    private void checkNormalTransform() {
 +        if (normalTransform == null) {
-+            normalTransform = new Matrix3f(matrix);
++            normalTransform = new org.joml.Matrix3f(matrix);
 +            normalTransform.invert();
 +            normalTransform.transpose();
 +        }

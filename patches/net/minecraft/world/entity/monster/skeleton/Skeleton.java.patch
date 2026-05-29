@@ -4,7 +4,7 @@
      }
  
      protected void doFreezeConversion() {
-+        if (!net.neoforged.neoforge.event.EventHooks.canLivingConvert(this, EntityType.STRAY, (timer) -> this.conversionTime = timer)) return;
++        if (!net.neoforged.neoforge.event.EventHooks.canLivingConvert(this, EntityTypes.STRAY, (timer) -> this.conversionTime = timer)) return;
          this.convertTo(EntityTypes.STRAY, ConversionParams.single(this, true, true), stray -> {
 +            net.neoforged.neoforge.event.EventHooks.onLivingConvert(this, stray);
              if (!this.isSilent()) {

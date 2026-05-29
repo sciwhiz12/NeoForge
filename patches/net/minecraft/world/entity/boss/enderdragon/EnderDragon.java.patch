@@ -1,20 +1,5 @@
 --- a/net/minecraft/world/entity/boss/enderdragon/EnderDragon.java
 +++ b/net/minecraft/world/entity/boss/enderdragon/EnderDragon.java
-@@ -101,6 +_,14 @@
-         this.setHealth(this.getMaxHealth());
-         this.noPhysics = true;
-         this.phaseManager = new EnderDragonPhaseManager(this);
-+        this.setId(ENTITY_COUNTER.getAndAdd(this.subEntities.length + 1) + 1); // Forge: Fix MC-158205: Make sure part ids are successors of parent mob id
-+    }
-+
-+    @Override
-+    public void setId(int id) {
-+        super.setId(id);
-+        for (int i = 0; i < this.subEntities.length; i++) // Forge: Fix MC-158205: Set part ids to successors of parent mob id
-+            this.subEntities[i].setId(id + i + 1);
-     }
- 
-     public void setDragonFight(EnderDragonFight fight) {
 @@ -149,8 +_,19 @@
          entityData.define(DATA_PHASE, EnderDragonPhase.HOVERING.getId());
      }

@@ -5,7 +5,7 @@
          if (this.isConverting()) {
              this.timeInOverworld++;
 -            if (this.timeInOverworld > 300) {
-+            if (this.timeInOverworld > 300 && net.neoforged.neoforge.event.EventHooks.canLivingConvert(this, EntityType.ZOGLIN, (timer) -> this.timeInOverworld = timer)) {
++            if (this.timeInOverworld > 300 && net.neoforged.neoforge.event.EventHooks.canLivingConvert(this, EntityTypes.ZOGLIN, (timer) -> this.timeInOverworld = timer)) {
                  this.makeSound(SoundEvents.HOGLIN_CONVERTED_TO_ZOMBIFIED);
                  this.finishConversion();
              }
@@ -14,7 +14,7 @@
      private void finishConversion() {
          this.convertTo(
 -            EntityTypes.ZOGLIN, ConversionParams.single(this, true, false), zoglin -> zoglin.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0))
-+            EntityType.ZOGLIN, ConversionParams.single(this, true, false), zoglin -> {
++            EntityTypes.ZOGLIN, ConversionParams.single(this, true, false), zoglin -> {
 +                zoglin.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
 +                net.neoforged.neoforge.event.EventHooks.onLivingConvert(this, zoglin);
 +            }
