@@ -22,7 +22,7 @@
              fov *= Mth.lerp(effectScale, 1.0F, 0.85714287F);
          }
  
-+        fov = net.neoforged.neoforge.client.ClientHooks.getFieldOfView(this.minecraft.gameRenderer, this, partialTicks, fov, useFovSetting);
++        fov = net.neoforged.neoforge.client.ClientHooks.getFieldOfView(this.minecraft.gameRenderer, this, partialTicks, fov);
          return fov;
      }
  
@@ -75,3 +75,21 @@
          FORWARDS.rotate(this.rotation, this.forwards);
          UP.rotate(this.rotation, this.up);
          LEFT.rotate(this.rotation, this.left);
+@@ -499,6 +_,17 @@
+ 
+     public void disablePanoramicMode() {
+         this.isPanoramicMode = false;
++    }
++
++    public float getRoll() {
++        return this.roll;
++    }
++
++    public BlockState getBlockAtCamera() {
++        if (!this.initialized) {
++            return Blocks.AIR.defaultBlockState();
++        }
++        return this.level.getBlockState(this.blockPosition).getStateAtViewpoint(this.level, this.blockPosition, this.position);
+     }
+ 
+     public static class NearPlane {
