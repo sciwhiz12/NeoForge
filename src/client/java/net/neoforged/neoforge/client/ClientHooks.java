@@ -50,6 +50,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.components.LerpingBossEvent;
@@ -230,34 +231,36 @@ public class ClientHooks {
         guiLayers.forEach(screen -> screen.resize(width, height));
     }
 
-    public static void clearGuiLayers(Minecraft minecraft) {
-        while (!guiLayers.isEmpty())
-            popGuiLayerInternal(minecraft);
+    public static void clearGuiLayers(Gui gui) {
+        while (!guiLayers.isEmpty()) {
+            popGuiLayerInternal(gui);
+        }
     }
 
-    private static void popGuiLayerInternal(Minecraft minecraft) {
-        if (minecraft.screen != null)
-            minecraft.screen.removed();
-        minecraft.screen = guiLayers.pop();
+    private static void popGuiLayerInternal(Gui gui) {
+        if (gui.screen() != null) {
+            gui.screen().removed();
+        }
+        gui.setScreen(guiLayers.pop());
     }
 
-    public static void pushGuiLayer(Minecraft minecraft, Screen screen) {
-        if (minecraft.screen != null)
-            guiLayers.push(minecraft.screen);
-        minecraft.screen = Objects.requireNonNull(screen);
-        screen.init(minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
-        minecraft.getNarrator().saySystemNow(screen.getNarrationMessage());
+    public static void pushGuiLayer(Gui gui, Screen screen) {
+        if (gui.screen() != null) {
+            guiLayers.push(gui.screen());
+        }
+        gui.setScreen(Objects.requireNonNull(screen));
     }
 
-    public static void popGuiLayer(Minecraft minecraft) {
+    public static void popGuiLayer(Gui gui) {
         if (guiLayers.isEmpty()) {
-            minecraft.setScreen(null);
+            gui.setScreen(null);
             return;
         }
 
-        popGuiLayerInternal(minecraft);
-        if (minecraft.screen != null)
-            minecraft.getNarrator().saySystemNow(minecraft.screen.getNarrationMessage());
+        popGuiLayerInternal(gui);
+        if (gui.screen() != null) {
+            gui.screen().triggerImmediateNarration(false);
+        }
     }
 
     /**
@@ -932,7 +935,7 @@ public class ClientHooks {
     }
 
     public static void reloadRenderer() {
-        Minecraft.getInstance().levelRenderer.allChanged();
+        Minecraft.getInstance().levelExtractor.allChanged();
     }
 
     public static List<AtlasManager.AtlasConfig> gatherTextureAtlases(List<AtlasManager.AtlasConfig> vanillaAtlases) {

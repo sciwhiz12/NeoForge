@@ -13,7 +13,7 @@
  
      public void onClose() {
 -        this.minecraft.gui.setScreen(null);
-+        this.minecraft.popGuiLayer();
++        this.minecraft.gui.popGuiLayer();
      }
  
      protected <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
