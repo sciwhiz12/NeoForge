@@ -16,6 +16,34 @@
      public void writeToBuffer(GpuBufferSlice destination, ByteBuffer data) {
          if (this.isInRenderPass) {
              throw new IllegalStateException("Close the existing render pass before performing additional commands");
+@@ -576,7 +_,26 @@
+             if (destination.getDepthOrLayers() > 1) {
+                 throw new UnsupportedOperationException("Textures with multiple depths or layers are not yet supported for copying");
+             }
+-
++
++            final var sourceFormat = source.getFormat();
++            final var destFormat = destination.getFormat();
++            if (sourceFormat.hasDepthAspect() || sourceFormat.hasStencilAspect()) {
++                if (sourceFormat != destFormat) {
++                    throw new IllegalArgumentException(
++                            "When copying depth or stencil data, the source and destination texture formats must be identical. Source: "
++                                    + sourceFormat + ", Destination: " + destFormat
++                    );
++                }
++            }
++
++            if (sourceFormat.hasColorAspect() != destFormat.hasColorAspect()) {
++                throw new IllegalArgumentException(
++                        "Source and destination texture formats must have consistent color aspects. Source: "
++                                + sourceFormat + ", Destination: " + destFormat
++                );
++            }
++
++
+             this.backend.copyTextureToTexture(source, destination, mipLevel, destX, destY, sourceX, sourceY, width, height);
+         } else {
+             throw new IllegalArgumentException(
 @@ -642,6 +_,24 @@
  
          if (depthTexture.getDepthOrLayers() > 1) {

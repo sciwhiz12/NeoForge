@@ -32,6 +32,6 @@
          return !(other instanceof RenderTargetDescriptor descriptor)
              ? false
 -            : this.width == descriptor.width && this.height == descriptor.height && this.useDepth == descriptor.useDepth && this.format == descriptor.format;
-+            : this.width == descriptor.width && this.height == descriptor.height && this.useDepth == descriptor.useDepth && this.useStencil == descriptor.useStencil;
++            : this.width == descriptor.width && this.height == descriptor.height && this.useDepth == descriptor.useDepth && this.format == descriptor.format && this.useStencil == descriptor.useStencil;
      }
  }

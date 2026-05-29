@@ -33,9 +33,9 @@
  
              ARBDirectStateAccess.glNamedFramebufferTexture(fbo, 36096, depth, depthMipLevel);
 +            if (useStencil) {
-+                ARBDirectStateAccess.glNamedFramebufferTexture(fbo, org.lwjgl.opengl.GL32C.GL_STENCIL_ATTACHMENT, depth, depthMipLevel);
++                ARBDirectStateAccess.glNamedFramebufferTexture(fbo, GL33C.GL_STENCIL_ATTACHMENT, depth, depthMipLevel);
 +            } else {
-+                ARBDirectStateAccess.glNamedFramebufferTexture(fbo, org.lwjgl.opengl.GL32C.GL_STENCIL_ATTACHMENT, 0, 0);
++                ARBDirectStateAccess.glNamedFramebufferTexture(fbo, GL33C.GL_STENCIL_ATTACHMENT, 0, 0);
 +            }
              if (bindSlot != 0) {
                  GlStateManager._glBindFramebuffer(bindSlot, fbo);
@@ -54,9 +54,9 @@
  
              GlStateManager._glFramebufferTexture2D(tempBindSlot, 36096, 3553, depth, depthMipLevel);
 +            if (useStencil) {
-+                GlStateManager._glFramebufferTexture2D(tempBindSlot, org.lwjgl.opengl.GL32C.GL_STENCIL_ATTACHMENT, 3553, depth, depthMipLevel);
++                GlStateManager._glFramebufferTexture2D(tempBindSlot, GL33C.GL_STENCIL_ATTACHMENT, 3553, depth, depthMipLevel);
 +            } else {
-+                GlStateManager._glFramebufferTexture2D(tempBindSlot, org.lwjgl.opengl.GL32C.GL_STENCIL_ATTACHMENT, 3553, 0, 0);
++                GlStateManager._glFramebufferTexture2D(tempBindSlot, GL33C.GL_STENCIL_ATTACHMENT, 3553, 0, 0);
 +            }
              if (bindSlot == 0) {
                  GlStateManager._glBindFramebuffer(tempBindSlot, oldFbo);
