@@ -1,0 +1,39 @@
+--- a/net/minecraft/client/renderer/SubmitNodeCollection.java
++++ b/net/minecraft/client/renderer/SubmitNodeCollection.java
+@@ -206,7 +_,7 @@
+     public void submitMovingBlock(PoseStack poseStack, MovingBlockRenderState movingBlockRenderState, int outlineColor) {
+         MovingBlockFeatureRenderer.Submit submit = new MovingBlockFeatureRenderer.Submit(new Matrix4f(poseStack.last().pose()), movingBlockRenderState, 0);
+         BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(movingBlockRenderState.blockState);
+-        if (model.hasMaterialFlag(1)) {
++        if (model.hasMaterialFlag(movingBlockRenderState, movingBlockRenderState.blockPos, movingBlockRenderState.blockState, 1)) {
+             this.translucentBlocksAndItems.submit(submit);
+         } else {
+             this.solid.submit(submit);
+@@ -249,6 +_,27 @@
+                         )
+                     );
+             }
++        }
++    }
++
++    @Override
++    public void submitMultiLayerBlockModel(
++            PoseStack poseStack,
++            List<BlockStateModelPart> modelParts,
++            boolean translucent,
++            int[] tintLayers,
++            int lightCoords,
++            int overlayCoords,
++            int outlineColor
++    ) {
++        PoseStack.Pose pose = poseStack.last().copy();
++        var submit = new net.neoforged.neoforge.client.submit.ExtendedBlockModelFeatureRenderer.Submit(
++                pose, modelParts, translucent, tintLayers, lightCoords, overlayCoords, -1
++        );
++        if (translucent) {
++            this.translucentBlocksAndItems.submit(submit);
++        } else {
++            this.solid.submit(submit);
+         }
+     }
+ 
