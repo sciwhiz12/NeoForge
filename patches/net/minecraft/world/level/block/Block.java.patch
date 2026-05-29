@@ -18,6 +18,33 @@
              String className = this.getClass().getSimpleName();
              if (!className.endsWith("Block")) {
                  LOGGER.error("Block classes should end with Block and {} doesn't.", className);
+@@ -289,7 +_,15 @@
+         }
+     }
+ 
++    /**
++     * @deprecated Neo: use overload with level context instead
++     */
++    @Deprecated
+     public static boolean shouldRenderFace(BlockState state, BlockState neighborState, Direction direction) {
++        return shouldRenderFace(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO, state, neighborState, direction);
++    }
++
++    public static boolean shouldRenderFace(BlockGetter level, BlockPos pos, BlockState state, BlockState neighborState, Direction direction) {
+         VoxelShape occluder = neighborState.getFaceOcclusionShape(direction.getOpposite());
+         if (occluder == Shapes.block()) {
+             return false;
+@@ -299,6 +_,10 @@
+             return false;
+         }
+ 
++        if (neighborState.hidesNeighborFace(level, pos.relative(direction), state, direction.getOpposite()) && state.supportsExternalFaceHiding()) {
++            return false;
++        }
++
+         if (occluder == Shapes.empty()) {
+             return true;
+         }
 @@ -371,22 +_,28 @@
  
      public static void dropResources(BlockState state, Level level, BlockPos pos) {

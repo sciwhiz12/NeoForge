@@ -18,7 +18,15 @@
              if (shouldBeRemoved(pos, level, shape)) {
                  dropResources(state, level, pos);
                  level.removeBlock(pos, movedByPiston);
-@@ -120,7 +_,7 @@
+@@ -113,14 +_,14 @@
+             return state;
+         }
+ 
+-        RailShape current = state.getValue(this.getShapeProperty());
++        RailShape current = getRailDirection(state, level, pos, null);
+         return new RailState(level, pos, state).place(level.hasNeighborSignal(pos), first, current).getState();
+     }
+ 
      @Override
      protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
          if (!movedByPiston) {

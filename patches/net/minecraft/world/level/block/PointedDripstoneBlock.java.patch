@@ -26,6 +26,15 @@
                          BlockPos stalactiteTipPos = findTip(state, level, pos, 11, false);
                          if (stalactiteTipPos != null) {
                              if (fluidInfo.get().sourceState.is(Blocks.MUD) && fluid == Fluids.WATER) {
+@@ -190,7 +_,7 @@
+     }
+ 
+     private static boolean canFillCauldron(Fluid fluidAbove) {
+-        return fluidAbove == Fluids.LAVA || fluidAbove == Fluids.WATER;
++        return fluidAbove.getFluidType().getDripInfo() != null;
+     }
+ 
+     @Override
 @@ -203,7 +_,9 @@
          if (fluidAbove.isSame(Fluids.EMPTY)) {
              return level.environmentAttributes().getValue(EnvironmentAttributes.DEFAULT_DRIPSTONE_PARTICLE, posAbove);

@@ -1,7 +1,14 @@
 --- a/net/minecraft/world/level/block/entity/BlockEntityType.java
 +++ b/net/minecraft/world/level/block/entity/BlockEntityType.java
-@@ -15,14 +_,39 @@
+@@ -11,18 +_,46 @@
+ 
+ public class BlockEntityType<T extends BlockEntity> {
+     private final BlockEntityType.BlockEntitySupplier<? extends T> factory;
++    /// Neo: This field will be modified by BlockEntityTypeAddBlocksEvent event. Please use the event to add to this field for vanilla or other mod's BlockEntityTypes.
+     private final Set<Block> validBlocks;
      private final Holder.Reference<BlockEntityType<?>> builtInRegistryHolder = BuiltInRegistries.BLOCK_ENTITY_TYPE.createIntrusiveHolder(this);
++    /// Neo: Allow modded BE types to declare that they have NBT data only OPs can set
++    private final boolean onlyOpCanSetNbt;
  
      public BlockEntityType(BlockEntityType.BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks) {
 +        this(factory, validBlocks, false);
