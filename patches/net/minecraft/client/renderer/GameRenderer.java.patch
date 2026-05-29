@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/GameRenderer.java
 +++ b/net/minecraft/client/renderer/GameRenderer.java
-@@ -150,13 +_,13 @@
+@@ -150,17 +_,17 @@
          this.guiRenderer = new GuiRenderer(
              this.gameRenderState.guiRenderState,
              this.featureRenderDispatcher,
@@ -21,6 +21,11 @@
          );
          this.screenEffectRenderer = new ScreenEffectRenderer(minecraft, atlasManager);
          this.debugCrosshairRenderer = new DebugCrosshairRenderer();
+-        this.mainRenderTarget = new MainTarget(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
++        this.mainRenderTarget = net.neoforged.neoforge.client.ClientHooks.instantiateMainTarget(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
+     }
+ 
+     @Override
 @@ -219,6 +_,7 @@
                  break;
              case null:
