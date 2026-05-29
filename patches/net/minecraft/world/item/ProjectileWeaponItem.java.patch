@@ -48,7 +48,7 @@
          }
  
 -        return arrow;
-+        return customArrow(arrowx, projectile, weapon);
++        return customArrow(arrow, projectile, weapon);
      }
  
      protected static List<ItemStack> draw(ItemStack weapon, ItemStack projectile, LivingEntity shooter) {
@@ -62,3 +62,24 @@
              ? EnchantmentHelper.processAmmoUse(serverLevel, weapon, projectile, 1)
              : 0;
          if (ammoToUse > projectile.getCount()) {
+@@ -139,5 +_,20 @@
+         }
+ 
+         return used;
++    }
++
++    public AbstractArrow customArrow(AbstractArrow arrow, ItemStack projectileStack, ItemStack weaponStack) {
++        return arrow;
++    }
++
++    /**
++     * Neo: Controls what ammo ItemStack that Creative Mode should return if the player has no valid ammo in inventory.
++     * Modded weapons should override this to return their own ammo if they do not use vanilla arrows.
++     * @param player The player (if in context) firing the weapon
++     * @param projectileWeaponItem The weapon ItemStack the ammo is for
++     * @return The default ammo ItemStack for this weapon
++     */
++    public ItemStack getDefaultCreativeAmmo(@Nullable Player player, ItemStack projectileWeaponItem) {
++        return Items.ARROW.getDefaultInstance();
+     }
+ }
