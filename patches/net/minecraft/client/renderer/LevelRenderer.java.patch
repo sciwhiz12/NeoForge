@@ -73,3 +73,16 @@
                  this.worldBorderRenderer
                      .render(this.levelRenderState.worldBorderRenderState, cameraState.pos, renderDistance, this.levelRenderState.cameraRenderState.depthFar);
              }
+@@ -632,10 +_,10 @@
+             section.setWasPreviouslyEmpty(false);
+             if (rebuildSync) {
+                 profiler.push("compileSectionSynchronously");
+-                section.compileSync(state.region());
++                section.compileSync(state.region(), state.additionalRenderers());
+                 profiler.pop();
+             } else {
+-                section.compileAsync(state.region());
++                section.compileAsync(state.region(), state.additionalRenderers());
+             }
+         }
+ 

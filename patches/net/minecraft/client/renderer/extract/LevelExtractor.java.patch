@@ -1,0 +1,16 @@
+--- a/net/minecraft/client/renderer/extract/LevelExtractor.java
++++ b/net/minecraft/client/renderer/extract/LevelExtractor.java
+@@ -157,11 +_,12 @@
+                         section.sectionMesh.get() != CompiledSectionMesh.UNCOMPILED
+                             || this.sectionUpdateTracker.hasAllNeighbors(this.level, section.getSectionNode())
+                     )) {
++                    var additionalRenderers = net.neoforged.neoforge.client.ClientHooks.gatherAdditionalRenderers(section.getRenderOrigin(), this.level);
+                     this.levelRenderState
+                         .sectionUpdateRenderStates
+                         .add(
+                             new SectionUpdateRenderState(
+-                                section.getSectionNode(), dirtyState.isDirtyFromPlayer(), cache.createRegion(this.level, section.getSectionNode())
++                                section.getSectionNode(), dirtyState.isDirtyFromPlayer(), cache.createRegion(this.level, section.getSectionNode()), additionalRenderers
+                             )
+                         );
+                     dirtyState.setNotDirty();

@@ -1,8 +1,11 @@
 --- a/net/minecraft/client/renderer/chunk/SectionCompiler.java
 +++ b/net/minecraft/client/renderer/chunk/SectionCompiler.java
-@@ -50,6 +_,10 @@
+@@ -49,7 +_,13 @@
+         this.blockColors = blockColors;
      }
  
++    /// @deprecated Neo: use [#compile(SectionPos, RenderSectionRegion, VertexSorting, SectionBufferBuilderPack, java.util.List)] instead
++    @Deprecated
      public SectionCompiler.Results compile(SectionPos sectionPos, RenderSectionRegion region, VertexSorting vertexSorting, SectionBufferBuilderPack builders) {
 +        return compile(sectionPos, region, vertexSorting, builders, List.of());
 +    }
