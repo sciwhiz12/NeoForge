@@ -6,10 +6,6 @@
 package net.neoforged.neoforge.common.data.internal;
 
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
@@ -25,6 +21,11 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider {
     public NeoForgeDamageTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
         super(output, lookupProvider, "neoforge");
@@ -34,7 +35,7 @@ public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider
     private boolean inVanilla;
 
     @Override
-    protected TagAppender<ResourceKey<DamageType>, DamageType> tag(TagKey<DamageType> tag) {
+    protected TagAppender<DamageType> tag(TagKey<DamageType> tag) {
         if (inVanilla) {
             return TagAppender.forBuilder(this.vanillaBuilders.computeIfAbsent(tag.location(), location -> TagBuilder.create()));
         }
@@ -61,7 +62,7 @@ public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider
         tag(Tags.DamageTypes.IS_MAGIC).addTags(Tags.DamageTypes.IS_POISON, Tags.DamageTypes.IS_WITHER);
 
         // Poisons should have the same behaviour as in vanilla
-        addAsVanilla(DamageTypes.MAGIC).addTags(Tags.DamageTypes.IS_POISON);
+        addAsVanilla(DamageTypes.MAGIC).addTag(Tags.DamageTypes.IS_POISON);
 
         tag(DamageTypes.IN_FIRE, Tags.DamageTypes.IS_ENVIRONMENT);
         tag(DamageTypes.ON_FIRE, Tags.DamageTypes.IS_ENVIRONMENT);
@@ -110,7 +111,7 @@ public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider
     }
 
     /** {@return an appender for vanilla tags that contain the given entry directly} */
-    private TagAppender<ResourceKey<DamageType>, DamageType> addAsVanilla(ResourceKey<DamageType> entry) {
+    private TagAppender<DamageType> addAsVanilla(ResourceKey<DamageType> entry) {
         final List<TagBuilder> builders = new ArrayList<>();
         vanillaBuilders.forEach((location, tagBuilder) -> {
             if (tagBuilder.build().stream().anyMatch(tagEntry -> tagEntry.verifyIfPresent(element -> element.equals(entry.identifier()), tag -> false))) {
@@ -133,8 +134,8 @@ public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider
         }
     }
 
-    private TagAppender<ResourceKey<DamageType>, DamageType> tagWithOptionalLegacy(TagKey<DamageType> tag) {
-        TagAppender<ResourceKey<DamageType>, DamageType> tagAppender = tag(tag);
+    private TagAppender<DamageType> tagWithOptionalLegacy(TagKey<DamageType> tag) {
+        TagAppender<DamageType> tagAppender = tag(tag);
         tagAppender.addOptionalTag(TagKey.create(Registries.DAMAGE_TYPE, Identifier.fromNamespaceAndPath("forge", tag.location().getPath())));
         return tagAppender;
     }

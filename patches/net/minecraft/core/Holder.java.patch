@@ -1,5 +1,24 @@
 --- a/net/minecraft/core/Holder.java
 +++ b/net/minecraft/core/Holder.java
+@@ -15,7 +_,8 @@
+ 
+ import net.neoforged.neoforge.common.extensions.IHolderExtension;
+ 
+-public sealed interface Holder<T> extends IHolderExtension<T> permits Holder.Direct, Holder.Reference {
++// TODO 26.2 - decide how to deal with Holder being seleaed
++public /* sealed */ interface Holder<T> extends IHolderExtension<T> /* permits Holder.Direct, Holder.Reference */ {
+     T value();
+ 
+     boolean isBound();
+@@ -129,7 +_,7 @@
+         DIRECT;
+     }
+ 
+-    non-sealed class Reference<T> implements Holder<T> {
++    /* non-sealed */ class Reference<T> implements Holder<T> {
+         private final HolderOwner<T> owner;
+         private @Nullable Set<TagKey<T>> tags;
+         private @Nullable DataComponentMap components;
 @@ -249,6 +_,15 @@
              this.value = value;
          }

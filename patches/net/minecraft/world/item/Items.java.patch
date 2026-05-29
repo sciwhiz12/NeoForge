@@ -1,5 +1,13 @@
 --- a/net/minecraft/world/item/Items.java
 +++ b/net/minecraft/world/item/Items.java
+@@ -9,6 +_,7 @@
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.component.DataComponents;
+ import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.core.registries.Registries;
+ import net.minecraft.references.BlockItemId;
+ import net.minecraft.references.BlockItemIds;
+ import net.minecraft.references.ItemIds;
 @@ -2099,11 +_,19 @@
      }
  
@@ -10,7 +18,7 @@
 -            Item.BY_BLOCK.put(alternative, item);
 -        }
 +        Item item = registerItem(
-+                blockIdToItemId(block.builtInRegistryHolder().key()),
++                ResourceKey.create(Registries.ITEM, block.builtInRegistryHolder().key().identifier()),
 +                p -> new BlockItem(block, p) {
 +                    @Override
 +                    public void registerBlocks(java.util.Map<Block, Item> map, Item self) {

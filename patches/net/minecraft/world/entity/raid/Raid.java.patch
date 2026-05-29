@@ -14,7 +14,7 @@
  
                  this.joinRaid(level, groupNumber, raider, pos, false);
 -                if (raiderType.entityType == EntityTypes.RAVAGER) {
-+                if (raiderType.entityTypeSupplier.get() == EntityType.RAVAGER) {
++                if (raiderType.entityTypeSupplier.get() == EntityTypes.RAVAGER) {
                      Raider ridingRaider = null;
                      if (groupNumber == this.getNumGroups(Difficulty.NORMAL)) {
                          ridingRaider = EntityTypes.PILLAGER.create(level, EntitySpawnReason.EVENT);
