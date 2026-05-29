@@ -1,0 +1,12 @@
+--- a/net/minecraft/client/gui/Gui.java
++++ b/net/minecraft/client/gui/Gui.java
+@@ -175,7 +_,8 @@
+             profiler.push("screen");
+ 
+             try {
+-                this.screen.extractRenderStateWithTooltipAndSubtitles(graphics, xMouse, yMouse, deltaTracker.getGameTimeDeltaTicks());
++                // Neo: Wrap Screen#extractRenderStateWithTooltipAndSubtitles() to allow for GUI Layers and ScreenEvent.Render.[Pre/Post]
++                net.neoforged.neoforge.client.ClientHooks.drawScreen(this.screen, graphics, xMouse, yMouse, deltaTracker.getGameTimeDeltaTicks());
+             } catch (Throwable t) {
+                 CrashReport report = CrashReport.forThrowable(t, "Rendering screen");
+                 CrashReportCategory category = report.addCategory("Screen render details");
