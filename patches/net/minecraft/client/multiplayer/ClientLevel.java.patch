@@ -49,6 +49,18 @@
      }
  
      private EnvironmentAttributeSystem.Builder addEnvironmentAttributeLayers(EnvironmentAttributeSystem.Builder environmentAttributes) {
+@@ -339,6 +_,11 @@
+     }
+ 
+     public void tickWeatherEffects() {
++        var camera = this.minecraft.gameRenderer.mainCamera();
++        var customWeatherEffectRenderer = net.neoforged.neoforge.client.CustomEnvironmentEffectsRendererManager.getCustomWeatherEffectRenderer(this, camera.position());
++        if (customWeatherEffectRenderer != null && customWeatherEffectRenderer.tickRain(this, this.getGameTime(), camera))
++            return;
++
+         ParticleStatus particleStatus = this.minecraft.options.particles().get();
+         int weatherRadius = this.minecraft.options.weatherRadius().get();
+         float rainLevel = this.getRainLevel(1.0F);
 @@ -471,7 +_,11 @@
          entity.setOldPosAndRot();
          entity.tickCount++;
