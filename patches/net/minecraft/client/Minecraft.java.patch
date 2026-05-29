@@ -26,15 +26,17 @@
          for (GpuBackend backend : preferredGraphicsBackend.getBackendsToTry()) {
              try {
                  GLFW.glfwDefaultWindowHints();
-@@ -457,7 +_,7 @@
+@@ -457,8 +_,8 @@
                          (id, type) -> this.getShaderManager().getShader(id, type),
                          new GpuDebugOptions(
                              this.options.glDebugVerbosity,
 -                            SharedConstants.DEBUG_SYNCHRONOUS_GL_LOGS,
+-                            gameConfig.game.renderDebugLabels,
 +                            SharedConstants.DEBUG_SYNCHRONOUS_GL_LOGS || enableGlDebug,
-                             gameConfig.game.renderDebugLabels,
++                            gameConfig.game.renderDebugLabels || enableGlDebug,
                              gameConfig.game.vulkanValidation
                          ),
+                         this::loadCriticalShaders
 @@ -522,12 +_,14 @@
              LOGGER.error("Couldn't set icon", e);
          }
