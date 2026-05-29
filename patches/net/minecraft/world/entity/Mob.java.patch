@@ -109,6 +109,14 @@
          return groupData;
      }
  
+@@ -1238,6 +_,7 @@
+ 
+         params.type().convert(this, newMob, params);
+         afterConversion.finalizeConversion(newMob);
++        if (!preventConversionSpawns)
+         if (this.level() instanceof ServerLevel serverLevel) {
+             serverLevel.addFreshEntity(newMob);
+         }
 @@ -1399,14 +_,24 @@
      }
  

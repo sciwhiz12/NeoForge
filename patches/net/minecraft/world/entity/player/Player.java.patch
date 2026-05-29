@@ -1,5 +1,13 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
+@@ -126,6 +_,7 @@
+ import net.neoforged.neoforge.common.extensions.IPlayerExtension;
+ 
+ public abstract class Player extends Avatar implements ContainerUser, IPlayerExtension {
++    public static final String PERSISTED_NBT_TAG = "PlayerPersisted";
+     public static final int MAX_HEALTH = 20;
+     public static final int SLEEP_DURATION = 100;
+     public static final int WAKE_UP_DURATION = 10;
 @@ -173,6 +_,10 @@
      private Optional<GlobalPos> lastDeathLocation = Optional.empty();
      public @Nullable FishingHook fishing;
@@ -105,6 +113,36 @@
      @Override
      protected void readAdditionalSaveData(ValueInput input) {
          super.readAdditionalSaveData(input);
+@@ -694,6 +_,8 @@
+         }
+ 
+         this.removeEntitiesOnShoulder();
++        damage = Math.max(0.0F, source.type().scaling().getScalingFunction().scaleDamage(source, this, damage, this.level().getDifficulty()));
++        if (false)
+         if (source.scalesWithDifficulty()) {
+             if (level.getDifficulty() == Difficulty.PEACEFUL) {
+                 damage = 0.0F;
+@@ -750,12 +_,14 @@
+     @Override
+     protected void actuallyHurt(ServerLevel level, DamageSource source, float dmg) {
+         if (!this.isInvulnerableTo(level, source)) {
+-            dmg = this.getDamageAfterArmorAbsorb(source, dmg);
+-            dmg = this.getDamageAfterMagicAbsorb(source, dmg);
+-            float originalDamage = dmg;
+-            dmg = Math.max(dmg - this.getAbsorptionAmount(), 0.0F);
+-            this.setAbsorptionAmount(this.getAbsorptionAmount() - (originalDamage - dmg));
+-            float absorbedDamage = originalDamage - dmg;
++            this.damageContainers.peek().setReduction(net.neoforged.neoforge.common.damagesource.DamageContainer.Reduction.ARMOR, this.damageContainers.peek().getNewDamage() - this.getDamageAfterArmorAbsorb(source, this.damageContainers.peek().getNewDamage()));
++            this.getDamageAfterMagicAbsorb(source, this.damageContainers.peek().getNewDamage());
++            float damage = net.neoforged.neoforge.common.CommonHooks.onLivingDamagePre(this, this.damageContainers.peek());
++            this.damageContainers.peek().setReduction(net.neoforged.neoforge.common.damagesource.DamageContainer.Reduction.ABSORPTION, Math.min(this.getAbsorptionAmount(), damage));
++            float absorbed = Math.min(damage, this.damageContainers.peek().getReduction(net.neoforged.neoforge.common.damagesource.DamageContainer.Reduction.ABSORPTION));
++            this.setAbsorptionAmount(Math.max(0, this.getAbsorptionAmount() - absorbed));
++            dmg = this.damageContainers.peek().getNewDamage();
++            float absorbedDamage = absorbed;
+             if (absorbedDamage > 0.0F && absorbedDamage < 3.4028235E37F) {
+                 this.awardStat(Stats.DAMAGE_ABSORBED, Math.round(absorbedDamage * 10.0F));
+             }
 @@ -769,7 +_,9 @@
                  }
  
@@ -200,6 +238,16 @@
                      float oldLivingEntityHealth = 0.0F;
                      if (entity instanceof LivingEntity livingTarget) {
                          oldLivingEntityHealth = livingTarget.getHealth();
+@@ -984,7 +_,8 @@
+                             entity, this.getKnockback(entity, damageSource) + (knockbackAttack ? 0.5F : 0.0F), oldMovement, damageSource, totalDamage
+                         );
+                         if (sweepAttack) {
+-                            this.doSweepAttack(entity, baseDamage, damageSource, attackStrengthScale);
++                            var sweepHitBox = attackingItemStack.getSweepHitBox(this, entity);
++                            this.doSweepAttack(entity, baseDamage, damageSource, attackStrengthScale, sweepHitBox);
+                         }
+ 
+                         this.attackVisualEffects(entity, criticalAttack, sweepAttack, fullStrengthAttack, false, magicBoost);
 @@ -999,6 +_,8 @@
  
                  this.postPiercingAttack();
@@ -219,6 +267,21 @@
              }
          }
  
+@@ -1079,11 +_,12 @@
+ 
+     private void itemAttackInteraction(Entity entity, ItemStack attackingItemStack, DamageSource damageSource, boolean applyToTarget) {
+         Entity hurtTarget = entity;
+-        if (entity instanceof EnderDragonPart enderDragonPart) {
+-            hurtTarget = enderDragonPart.parentMob;
++        if (entity instanceof net.neoforged.neoforge.entity.PartEntity<?> partEntity) {
++            hurtTarget = partEntity.getParent();
+         }
+ 
+         boolean itemHurtEnemy = false;
++        ItemStack copy = attackingItemStack.copy();
+         if (this.level() instanceof ServerLevel serverLevel) {
+             if (hurtTarget instanceof LivingEntity livingTarget) {
+                 itemHurtEnemy = attackingItemStack.hurtEnemy(livingTarget, this);
 @@ -1100,6 +_,7 @@
              }
  
@@ -262,6 +325,16 @@
          super.stopSleeping();
          if (this.level() instanceof ServerLevel && updateLevelList) {
              ((ServerLevel)this.level()).updateSleepingPlayerList();
+@@ -1429,7 +_,8 @@
+ 
+     @Override
+     public boolean causeFallDamage(double fallDistance, float damageModifier, DamageSource damageSource) {
+-        if (this.abilities.mayfly) {
++        if (this.mayFly()) {
++            net.neoforged.neoforge.event.EventHooks.onPlayerFall(this, damageModifier, damageModifier);
+             return false;
+         }
+ 
 @@ -1464,13 +_,13 @@
      protected void playStepSound(BlockPos onPos, BlockState onState) {
          if (this.isInWater()) {
@@ -331,6 +404,34 @@
          return this.decorateDisplayNameComponent(result);
      }
  
+@@ -1859,22 +_,22 @@
+             return ItemStack.EMPTY;
+         }
+ 
+-        Predicate<ItemStack> supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getSupportedHeldProjectiles();
++        Predicate<ItemStack> supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getSupportedHeldProjectiles(heldWeapon);
+         ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedProjectiles);
+         if (!heldProjectile.isEmpty()) {
+-            return heldProjectile;
++            return net.neoforged.neoforge.common.CommonHooks.getProjectile(this, heldWeapon, heldProjectile);
+         }
+ 
+-        supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getAllSupportedProjectiles();
++        supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getAllSupportedProjectiles(heldWeapon);
+ 
+         for (int i = 0; i < this.inventory.getContainerSize(); i++) {
+             ItemStack itemStack = this.inventory.getItem(i);
+             if (supportedProjectiles.test(itemStack)) {
+-                return itemStack;
++                return net.neoforged.neoforge.common.CommonHooks.getProjectile(this, heldWeapon, itemStack);
+             }
+         }
+ 
+-        return this.hasInfiniteMaterials() ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
++        return net.neoforged.neoforge.common.CommonHooks.getProjectile(this, heldWeapon, this.abilities.instabuild ? ((ProjectileWeaponItem)heldWeapon.getItem()).getDefaultCreativeAmmo(this, heldWeapon) : ItemStack.EMPTY);
+     }
+ 
+     @Override
 @@ -1914,7 +_,7 @@
      }
  
