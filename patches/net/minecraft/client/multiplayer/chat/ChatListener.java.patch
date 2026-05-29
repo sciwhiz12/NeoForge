@@ -7,7 +7,7 @@
 -                this.minecraft.gui.hud.getChat().addPlayerMessage(decoratedMessage, null, GuiMessageTag.system());
 +                Component forgeComponent = net.neoforged.neoforge.client.ClientHooks.onClientChat(boundChatType, decoratedMessage, Util.NIL_UUID);
 +                if (forgeComponent == null) return false;
-+                this.minecraft.gui.getChat().addPlayerMessage(forgeComponent, null, GuiMessageTag.system());
++                this.minecraft.gui.hud.getChat().addPlayerMessage(forgeComponent, null, GuiMessageTag.system());
                  this.narrateChatMessage(boundChatType, message);
                  this.logSystemMessage(decoratedMessage, received);
                  this.previousMessageTime = Util.getMillis();
@@ -18,7 +18,7 @@
 -                    this.minecraft.gui.hud.getChat().addPlayerMessage(decoratedMessage, signature, tag);
 +                    Component forgeComponent = net.neoforged.neoforge.client.ClientHooks.onClientPlayerChat(boundChatType, decoratedMessage, message, message.sender());
 +                    if (forgeComponent == null) return false;
-+                    this.minecraft.gui.getChat().addPlayerMessage(forgeComponent, signature, tag);
++                    this.minecraft.gui.hud.getChat().addPlayerMessage(forgeComponent, signature, tag);
                      this.narrateChatMessage(boundChatType, message.decoratedContent());
                  } else {
                      Component filteredContent = filterMask.applyWithFormatting(message.signedContent());
@@ -26,10 +26,19 @@
 -                        this.minecraft.gui.hud.getChat().addPlayerMessage(boundChatType.decorate(filteredContent), signature, tag);
 +                        Component forgeComponent = net.neoforged.neoforge.client.ClientHooks.onClientPlayerChat(boundChatType, boundChatType.decorate(filteredContent), message, message.sender());
 +                        if (forgeComponent == null) return false;
-+                        this.minecraft.gui.getChat().addPlayerMessage(forgeComponent, signature, tag);
++                        this.minecraft.gui.hud.getChat().addPlayerMessage(forgeComponent, signature, tag);
                          this.narrateChatMessage(boundChatType, filteredContent);
                      }
                  }
+@@ -214,6 +_,8 @@
+     public void handleSystemMessage(Component message, boolean remote) {
+         UUID guessedUUID = this.guessChatUUID(message);
+         if (!this.minecraft.options.hideMatchedNames().get() || !this.minecraft.isBlocked(guessedUUID)) {
++            message = net.neoforged.neoforge.client.ClientHooks.onClientSystemChat(message, false);
++            if (message == null) return;
+             if (guessedUUID == Util.NIL_UUID || !this.minecraft.isFriendOnlyRestricted(guessedUUID)) {
+                 LocalPlayer receiver = this.minecraft.player;
+                 if (receiver != null && receiver.chatAbilities().canReceiveSystemMessages()) {
 @@ -231,6 +_,8 @@
      }
  

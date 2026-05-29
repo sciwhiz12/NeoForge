@@ -37,6 +37,28 @@
                      DisconnectionDetails details;
                      if (listener != null) {
                          details = listener.createDisconnectionInfo(reason, cause);
+@@ -201,6 +_,7 @@
+             throw new IllegalStateException("Invalid inbound protocol: " + protocol.id());
+         }
+ 
++        this.inboundProtocol = protocol;
+         this.packetListener = packetListener;
+         this.disconnectListener = null;
+         UnconfiguredPipelineHandler.InboundConfigurationTask configMessage = UnconfiguredPipelineHandler.setupInboundProtocol(protocol);
+@@ -222,7 +_,12 @@
+         BundlerInfo bundlerInfo = protocol.bundlerInfo();
+         if (bundlerInfo != null) {
+             PacketBundleUnpacker newUnbundler = new PacketBundleUnpacker(bundlerInfo);
+-            configMessage = configMessage.andThen(ctx -> ctx.pipeline().addAfter("encoder", "unbundler", newUnbundler));
++            configMessage = configMessage.andThen(ctx -> {
++                ctx.pipeline().addAfter("encoder", "unbundler", newUnbundler);
++                // Neo: our handlers must be between the encoder and the unbundler, so re-inject them
++                // Note, this call must be inside the .andThen lambda, or it will actually run before the unbundler gets added.
++                net.neoforged.neoforge.network.filters.NetworkFilters.injectIfNecessary(this);
++            });
+         }
+ 
+         boolean isLoginProtocol = protocol.id() == ConnectionProtocol.LOGIN;
 @@ -381,7 +_,7 @@
          if (this.address == null) {
              return "local";
@@ -54,3 +76,21 @@
          return new Bootstrap().group(eventLoopGroupHolder.eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
              @Override
              protected void initChannel(Channel channel) {
+@@ -598,5 +_,17 @@
+ 
+     public @Nullable UUID getIntendedProfileId() {
+         return this.intendedProfileId;
++    }
++
++    public Channel channel() {
++        return this.channel;
++    }
++
++    public PacketFlow getDirection() {
++        return this.receiving;
++    }
++
++    public ProtocolInfo<?> getInboundProtocol() {
++        return Objects.requireNonNull(this.inboundProtocol, "Inbound protocol not set?");
+     }
+ }

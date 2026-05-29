@@ -19,6 +19,17 @@
          }
      }
  
+@@ -338,8 +_,8 @@
+             return 0.0F;
+         }
+ 
+-        int modifier = player.hasCorrectToolForDrops(state) ? 30 : 100;
+-        return player.getDestroySpeed(state) / destroySpeed / modifier;
++        int modifier = net.neoforged.neoforge.event.EventHooks.doPlayerHarvestCheck(player, state, level, pos) ? 30 : 100;
++        return player.getDestroySpeed(state, pos) / destroySpeed / (float)modifier;
+     }
+ 
+     protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack tool, boolean dropExperience) {
 @@ -386,10 +_,13 @@
          return this.isRandomlyTicking;
      }

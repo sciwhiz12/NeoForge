@@ -18,7 +18,15 @@
      }
  
      protected void holdInMainHand(ItemStack itemStack) {
-@@ -367,7 +_,7 @@
+@@ -360,14 +_,14 @@
+ 
+     protected void holdInOffHand(ItemStack itemStack) {
+         this.setItemSlotAndDropWhenKilled(EquipmentSlot.OFFHAND, itemStack);
+-        if (!itemStack.is(PiglinAi.BARTERING_ITEM)) {
++        if (!itemStack.isPiglinCurrency()) {
+             this.setPersistenceRequired();
+         }
+     }
  
      @Override
      public boolean wantsToPickUp(ServerLevel level, ItemStack itemStack) {

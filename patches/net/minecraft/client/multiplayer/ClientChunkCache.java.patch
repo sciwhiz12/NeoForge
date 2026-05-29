@@ -8,3 +8,11 @@
                  this.storage.drop(index, currentChunk);
              }
          }
+@@ -124,6 +_,7 @@
+         }
+ 
+         this.level.onChunkLoaded(pos);
++        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.level.ChunkEvent.Load(chunk, false));
+         return chunk;
+     }
+ 

@@ -1,5 +1,14 @@
 --- a/net/minecraft/world/entity/ai/behavior/HarvestFarmland.java
 +++ b/net/minecraft/world/entity/ai/behavior/HarvestFarmland.java
+@@ -46,7 +_,7 @@
+     }
+ 
+     protected boolean checkExtraStartConditions(ServerLevel level, Villager body) {
+-        if (!level.getGameRules().get(GameRules.MOB_GRIEFING)) {
++        if (!net.neoforged.neoforge.event.EventHooks.canEntityGrief(level, body)) {
+             return false;
+         }
+ 
 @@ -82,7 +_,7 @@
          BlockState state = level.getBlockState(blockPos);
          Block block = state.getBlock();
