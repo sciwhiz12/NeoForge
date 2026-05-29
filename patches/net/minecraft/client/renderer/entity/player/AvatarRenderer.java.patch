@@ -1,5 +1,18 @@
 --- a/net/minecraft/client/renderer/entity/player/AvatarRenderer.java
 +++ b/net/minecraft/client/renderer/entity/player/AvatarRenderer.java
+@@ -94,6 +_,12 @@
+     }
+ 
+     private static HumanoidModel.ArmPose getArmPose(Avatar avatar, ItemStack itemInHand, InteractionHand hand) {
++        var extensions = net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(itemInHand);
++        var armPose = extensions.getArmPose(avatar, hand, itemInHand);
++        if (armPose != null) {
++            return armPose;
++        }
++
+         if (itemInHand.isEmpty()) {
+             return HumanoidModel.ArmPose.EMPTY;
+         }
 @@ -154,6 +_,13 @@
          poseStack.scale(0.9375F, 0.9375F, 0.9375F);
      }
