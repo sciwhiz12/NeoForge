@@ -35,6 +35,7 @@ import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ColorCollection;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ICondition;
@@ -74,22 +75,7 @@ public final class NeoForgeRecipeProvider extends VanillaRecipeProvider {
         replace(Items.DIAMOND, Tags.Items.GEMS_DIAMOND);
         replace(Items.EMERALD, Tags.Items.GEMS_EMERALD);
 
-        replace(Items.DYED_BUNDLE.pick(DyeColor.WHITE), Tags.Items.DYES_WHITE);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.ORANGE), Tags.Items.DYES_ORANGE);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.MAGENTA), Tags.Items.DYES_MAGENTA);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.LIGHT_BLUE), Tags.Items.DYES_LIGHT_BLUE);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.YELLOW), Tags.Items.DYES_YELLOW);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.LIME), Tags.Items.DYES_LIME);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.PINK), Tags.Items.DYES_PINK);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.GRAY), Tags.Items.DYES_GRAY);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.LIGHT_GRAY), Tags.Items.DYES_LIGHT_GRAY);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.CYAN), Tags.Items.DYES_CYAN);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.PURPLE), Tags.Items.DYES_PURPLE);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.BLUE), Tags.Items.DYES_BLUE);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.BROWN), Tags.Items.DYES_BROWN);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.GREEN), Tags.Items.DYES_GREEN);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.RED), Tags.Items.DYES_RED);
-        replace(Items.DYED_BUNDLE.pick(DyeColor.BLACK), Tags.Items.DYES_BLACK);
+        ColorCollection.zipApply(Items.DYE, ColorCollection.VALUES.map(DyeColor::getTag), this::replace);
 
         replace(Blocks.COBBLESTONE, Tags.Items.COBBLESTONES_NORMAL);
         replace(Blocks.COBBLED_DEEPSLATE, Tags.Items.COBBLESTONES_DEEPSLATE);
