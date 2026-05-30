@@ -1,5 +1,13 @@
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
+@@ -274,6 +_,7 @@
+     public final LevelExtractor levelExtractor;
+     public final LevelRenderer levelRenderer;
+     private final EntityRenderDispatcher entityRenderDispatcher;
++    private final BlockModelResolver blockModelResolver;
+     private final ItemModelResolver itemModelResolver;
+     private final MapRenderer mapRenderer;
+     public final ParticleEngine particleEngine;
 @@ -404,7 +_,6 @@
              }
          }, Util.nonCriticalIoPool());
@@ -54,7 +62,7 @@
          this.resourcePackRepository.reload();
          this.options.loadSelectedResourcePacks(this.resourcePackRepository);
          this.languageManager = new LanguageManager(this.options.languageCode, var1 -> {
-@@ -563,6 +_,7 @@
+@@ -563,11 +_,13 @@
          RenderSystem.setupDefaultState();
          this.window.setErrorSection("Post startup");
          this.blockColors = BlockColors.createDefault();
@@ -62,6 +70,12 @@
          this.modelManager = new ModelManager(this.blockColors, this.atlasManager, this.playerSkinRenderCache);
          this.resourceManager.registerReloadListener(this.modelManager);
          EquipmentAssetManager equipmentAssets = new EquipmentAssetManager();
+         this.resourceManager.registerReloadListener(equipmentAssets);
+         BlockModelResolver blockModelResolver = new BlockModelResolver(this.modelManager);
++        this.blockModelResolver = blockModelResolver;
+         this.itemModelResolver = new ItemModelResolver(this.modelManager);
+         this.mapTextureManager = new MapTextureManager(this.textureManager);
+         this.mapRenderer = new MapRenderer(this.atlasManager, this.mapTextureManager);
 @@ -606,6 +_,7 @@
          this.resourceManager.registerReloadListener(particleResources);
          this.particleEngine = new ParticleEngine(this.level, particleResources);
@@ -394,3 +408,14 @@
              boolean includeData = this.hasControlDown();
              switch (this.hitResult) {
                  case BlockHitResult blockHitResult:
+@@ -2832,6 +_,10 @@
+         }
+ 
+         return defaultTickTargetMillis;
++    }
++
++    public BlockModelResolver getBlockModelResolver() {
++        return this.blockModelResolver;
+     }
+ 
+     public ItemModelResolver getItemModelResolver() {
