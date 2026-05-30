@@ -168,6 +168,7 @@ public enum NeoForgeRenderTypes {
             RenderSetup state = RenderSetup.builder(NeoForgeRenderPipelines.ITEM_CUTOUT_UNLIT)
                     .withTexture("Sampler0", texture)
                     .useLightmap()
+                    .useOverlay()
                     .affectsCrumbling()
                     .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
                     .createRenderSetup();
@@ -179,6 +180,7 @@ public enum NeoForgeRenderTypes {
                     .withTexture("Sampler0", texture)
                     .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
                     .useLightmap()
+                    .useOverlay()
                     .affectsCrumbling()
                     .sortOnUpload()
                     .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
