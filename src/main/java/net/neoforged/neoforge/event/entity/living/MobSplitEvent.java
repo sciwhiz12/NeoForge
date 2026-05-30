@@ -5,6 +5,7 @@
 
 package net.neoforged.neoforge.event.entity.living;
 
+import java.util.List;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.cubemob.AbstractCubeMob;
@@ -12,8 +13,6 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.List;
 
 /**
  * This event is fired whenever a mob is removed and splits into multiple children. It only fires on the logical server.

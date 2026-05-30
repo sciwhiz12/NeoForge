@@ -19,7 +19,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
@@ -210,7 +209,6 @@ public final class NeoForgeBlockTagsProvider extends BlockTagsProvider {
     }
 
     protected record Appender(TagAppender<Block> app) implements TagAppender<Block> {
-
         @Override
         public Appender add(ResourceKey<Block> element) {
             app.add(element);
@@ -273,6 +271,7 @@ public final class NeoForgeBlockTagsProvider extends BlockTagsProvider {
             return this;
         }
     }
+
     @Override
     protected Appender tag(TagKey<Block> tag) {
         return new Appender(super.tag(tag));

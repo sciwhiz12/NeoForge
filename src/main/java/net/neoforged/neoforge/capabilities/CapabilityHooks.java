@@ -5,6 +5,7 @@
 
 package net.neoforged.neoforge.capabilities;
 
+import java.util.List;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -39,8 +40,6 @@ import net.neoforged.neoforge.transfer.item.PlayerInventoryWrapper;
 import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.List;
 
 @ApiStatus.Internal
 public class CapabilityHooks {
@@ -87,10 +86,8 @@ public class CapabilityHooks {
             return ComposterWrapper.get(level, pos, side);
         }, Blocks.COMPOSTER);
 
-        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) ->
-                ((ChestBlock) state.getBlock()).combine(state, level, pos, true).apply(CHEST_COMBINER_HANDLER), Blocks.CHEST, Blocks.TRAPPED_CHEST);
-        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) ->
-                ((ChestBlock) state.getBlock()).combine(state, level, pos, true).apply(CHEST_COMBINER_HANDLER), Blocks.COPPER_CHEST.asList().toArray(Block[]::new));
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> ((ChestBlock) state.getBlock()).combine(state, level, pos, true).apply(CHEST_COMBINER_HANDLER), Blocks.CHEST, Blocks.TRAPPED_CHEST);
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> ((ChestBlock) state.getBlock()).combine(state, level, pos, true).apply(CHEST_COMBINER_HANDLER), Blocks.COPPER_CHEST.asList().toArray(Block[]::new));
 
         var sidedVanillaContainers = List.of(
                 BlockEntityTypes.BLAST_FURNACE,

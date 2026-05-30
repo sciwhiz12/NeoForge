@@ -74,8 +74,7 @@ public final class ExtendedBlockModelFeatureRenderer extends RenderTypeFeatureRe
             int[] tintLayers,
             int lightCoords,
             int overlayCoords,
-            int tintColor
-    ) implements TranslucentSubmit {
+            int tintColor) implements TranslucentSubmit {
         @Override
         public float distanceToCameraSq() {
             return TranslucentSubmit.computeDistanceToCameraSq(this.pose.pose(), 0.5F, 0.5F, 0.5F);

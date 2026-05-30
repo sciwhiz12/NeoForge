@@ -5,6 +5,7 @@
 
 package net.neoforged.neoforge.common.data.internal;
 
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
@@ -16,8 +17,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidIds;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags.Fluids;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class NeoForgeFluidTagsProvider extends FluidTagsProvider {
     public NeoForgeFluidTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {

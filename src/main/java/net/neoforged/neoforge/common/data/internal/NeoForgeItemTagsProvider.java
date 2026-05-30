@@ -344,7 +344,6 @@ public final class NeoForgeItemTagsProvider extends BlockTagCopyingItemTagProvid
     }
 
     protected record Appender(TagAppender<Item> app) implements TagAppender<Item> {
-
         @Override
         public Appender add(ResourceKey<Item> element) {
             app.add(element);
@@ -400,6 +399,7 @@ public final class NeoForgeItemTagsProvider extends BlockTagCopyingItemTagProvid
             return this;
         }
     }
+
     @Override
     protected Appender tag(TagKey<Item> tag) {
         return new Appender(super.tag(tag));
